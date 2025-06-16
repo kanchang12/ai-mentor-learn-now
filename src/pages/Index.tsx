@@ -1,14 +1,14 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { PlayCircle, Sparkles, Brain, MessageSquare, Image, BarChart3, Code } from "lucide-react";
+import { PlayCircle, Sparkles, Brain, MessageSquare, Image, BarChart3 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-blue-50">
       {/* Header */}
-      <header className="p-6 bg-white/80 backdrop-blur-sm border-b border-blue-100">
+      <header className="p-6 bg-white/90 backdrop-blur-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <Brain className="h-8 w-8 text-blue-600" />
@@ -76,7 +76,7 @@ const Index = () => {
           </p>
           
           <div className="grid md:grid-cols-3 gap-8">
-            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
               <CardContent className="p-8 text-center">
                 <div className="p-3 bg-blue-100 rounded-full w-fit mx-auto mb-4 group-hover:bg-blue-200 transition-colors">
                   <MessageSquare className="h-8 w-8 text-blue-600" />
@@ -86,7 +86,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
               <CardContent className="p-8 text-center">
                 <div className="p-3 bg-purple-100 rounded-full w-fit mx-auto mb-4 group-hover:bg-purple-200 transition-colors">
                   <Image className="h-8 w-8 text-purple-600" />
@@ -96,7 +96,7 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/60 backdrop-blur-sm">
+            <Card className="group hover:shadow-xl transition-all duration-300 border-0 bg-white/80 backdrop-blur-sm">
               <CardContent className="p-8 text-center">
                 <div className="p-3 bg-green-100 rounded-full w-fit mx-auto mb-4 group-hover:bg-green-200 transition-colors">
                   <BarChart3 className="h-8 w-8 text-green-600" />
@@ -151,7 +151,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-blue-100 bg-white/50 backdrop-blur-sm py-12 mt-20">
+      <footer className="border-t border-gray-200 bg-white/50 backdrop-blur-sm py-12 mt-20">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <Brain className="h-6 w-6 text-blue-600" />
