@@ -9,7 +9,7 @@ const Index = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black overflow-hidden">
       {/* Navigation */}
       <nav className="bg-black/80 backdrop-blur-lg border-b border-gray-800 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,7 +20,6 @@ const Index = () => {
               </div>
             </div>
             
-            {/* Desktop Menu */}
             <div className="hidden md:flex items-center space-x-6">
               <a href="#features" className="text-gray-300 hover:text-white transition-colors">Features</a>
               <a href="#video" className="text-gray-300 hover:text-white transition-colors">How it Works</a>
@@ -33,7 +32,6 @@ const Index = () => {
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
             <div className="md:hidden">
               <Button
                 variant="ghost"
@@ -46,7 +44,6 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-800">
               <div className="flex flex-col space-y-2">
@@ -65,88 +62,91 @@ const Index = () => {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Modern background with geometric shapes */}
+      {/* Hero Section - Non-linear Design */}
+      <section className="relative min-h-screen">
+        {/* Background Elements */}
         <div className="absolute inset-0">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl"></div>
+          <div className="absolute top-20 -left-40 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-40 -right-32 w-[600px] h-[400px] bg-purple-500/15 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/3 right-1/4 w-72 h-72 bg-pink-500/10 rounded-full blur-3xl"></div>
         </div>
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center">
-            <div className="inline-flex items-center bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-full px-6 py-3 mb-8">
-              <Sparkles className="h-4 w-4 text-yellow-400 mr-2" />
-              <span className="text-gray-200 text-sm font-medium">Free: 30 minutes daily • No credit card required</span>
-            </div>
-            
-            <h1 className="text-6xl md:text-8xl font-black text-white mb-8 leading-none">
-              Learn AI by
-              <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Doing Real Projects
-              </span>
-            </h1>
-            
-            <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed font-light">
-              Master AI tools through hands-on YouTube tutorials with your personal AI companion. 
-              Get instant help, track progress, and build real skills that matter.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-              <Link to="/signup">
-                <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-12 py-6 text-lg font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all">
-                  Start Learning Free
-                  <ArrowRight className="ml-3 h-6 w-6" />
-                </Button>
-              </Link>
-              <Button size="lg" variant="outline" className="px-12 py-6 text-lg font-semibold border-gray-600 text-white hover:bg-gray-800 bg-transparent">
-                Watch Demo
-                <PlayCircle className="ml-3 h-6 w-6" />
-              </Button>
-            </div>
+        {/* Floating Elements */}
+        <div className="absolute top-32 right-16 hidden lg:block">
+          <div className="bg-gray-900/40 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 transform rotate-6">
+            <MessageSquare className="h-8 w-8 text-blue-400 mb-2" />
+            <p className="text-white text-sm font-medium">AI Companion</p>
           </div>
         </div>
-      </section>
-
-      {/* Video Explanation Section */}
-      <section id="video" className="py-32 bg-gradient-to-b from-black to-gray-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-5xl md:text-6xl font-black text-white mb-8">
-              See How It Works
-            </h2>
-            <p className="text-xl text-gray-300 max-w-3xl mx-auto font-light">
-              Watch our founder explain how HowToUseAI.uk transforms the way you learn AI tools
-            </p>
+        
+        <div className="absolute bottom-40 left-16 hidden lg:block">
+          <div className="bg-gray-900/40 backdrop-blur-sm border border-gray-700 rounded-2xl p-6 transform -rotate-3">
+            <Target className="h-8 w-8 text-purple-400 mb-2" />
+            <p className="text-white text-sm font-medium">Track Progress</p>
           </div>
+        </div>
 
-          <div className="max-w-5xl mx-auto">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800">
-              {/* Video placeholder */}
-              <div className="aspect-video bg-gray-900 flex items-center justify-center relative">
-                <div className="text-center">
-                  <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto hover:bg-blue-700 transition-colors cursor-pointer">
-                    <PlayCircle className="w-12 h-12 text-white" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-20">
+          <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
+            {/* Left Column - Text Content */}
+            <div className="space-y-8">
+              <div className="inline-flex items-center bg-gray-900/50 backdrop-blur-sm border border-gray-700 rounded-full px-6 py-3">
+                <Sparkles className="h-4 w-4 text-yellow-400 mr-2" />
+                <span className="text-gray-200 text-sm font-medium">Free: 30 minutes daily • No credit card required</span>
+              </div>
+              
+              <h1 className="text-5xl md:text-7xl font-black text-white leading-tight">
+                Learn AI by
+                <span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  Doing Real Projects
+                </span>
+              </h1>
+              
+              <p className="text-xl text-gray-300 leading-relaxed font-light max-w-lg">
+                Master AI tools through hands-on YouTube tutorials with your personal AI companion. 
+                Get instant help, track progress, and build real skills that matter.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link to="/signup">
+                  <Button size="lg" className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-6 text-lg font-bold shadow-xl">
+                    Start Learning Free
+                    <ArrowRight className="ml-3 h-6 w-6" />
+                  </Button>
+                </Link>
+                <Button size="lg" variant="outline" className="px-8 py-6 text-lg font-semibold border-gray-600 text-white hover:bg-gray-800/50 bg-transparent/50 backdrop-blur-sm">
+                  Watch Demo
+                  <PlayCircle className="ml-3 h-6 w-6" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Column - Video with Overlapping Elements */}
+            <div className="relative">
+              <div className="relative z-10 rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-gray-900 to-black border border-gray-800 transform lg:rotate-2">
+                <div className="aspect-video bg-gray-900 flex items-center justify-center relative">
+                  <div className="text-center p-8">
+                    <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mb-6 mx-auto hover:bg-blue-700 transition-colors cursor-pointer">
+                      <PlayCircle className="w-10 h-10 text-white" />
+                    </div>
+                    <h3 className="text-white text-xl font-bold mb-4">Watch Our Introduction</h3>
+                    <p className="text-gray-400 text-sm">
+                      Add your YouTube video ID to replace this placeholder
+                    </p>
                   </div>
-                  <h3 className="text-white text-2xl font-bold mb-4">Add Your Introduction Video</h3>
-                  <p className="text-gray-400 text-lg mb-2">
-                    Replace this placeholder with your YouTube video
-                  </p>
-                  <p className="text-gray-500 text-sm max-w-md mx-auto">
-                    Simply add your YouTube video ID to the iframe src in the code
-                  </p>
-                  {/* Uncomment and replace YOUR_VIDEO_ID with your actual YouTube video ID */}
-                  {/* 
-                  <iframe 
-                    className="w-full h-full absolute inset-0"
-                    src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
-                    title="How to Use AI - Platform Explanation"
-                    frameBorder="0" 
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                    allowFullScreen
-                  />
-                  */}
+                </div>
+              </div>
+              
+              {/* Overlapping Feature Cards */}
+              <div className="absolute -bottom-8 -left-8 bg-gray-900/90 backdrop-blur-sm border border-gray-700 rounded-xl p-4 transform -rotate-3">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                    <CheckCircle className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-white font-semibold text-sm">30+ Tutorials</p>
+                    <p className="text-gray-400 text-xs">Step by step guides</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -154,8 +154,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-32 bg-gray-900">
+      {/* Features Section - Asymmetrical Grid */}
+      <section id="features" className="py-32 bg-gray-900 relative">
+        <div className="absolute top-20 left-20 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl"></div>
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-5xl md:text-6xl font-black text-white mb-8">
@@ -166,44 +168,58 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="bg-gray-800/50 backdrop-blur-sm border-gray-700 text-center hover:bg-gray-800/70 transition-all duration-300 hover:scale-105 hover:shadow-xl">
-              <CardHeader>
-                <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <PlayCircle className="h-10 w-10 text-white" />
-                </div>
-                <CardTitle className="text-white text-2xl font-bold">Video Tutorials</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CardDescription className="text-gray-300 text-lg leading-relaxed">
-                  Step-by-step YouTube tutorials covering everything from ChatGPT to Midjourney and business automation.
-                </CardDescription>
-              </CardContent>
-            </Card>
+          {/* Non-linear Feature Grid */}
+          <div className="grid lg:grid-cols-3 gap-8 relative">
+            {/* Large Feature Card */}
+            <div className="lg:col-span-2 lg:row-span-2">
+              <Card className="bg-gradient-to-br from-blue-600/20 to-purple-600/20 backdrop-blur-sm border-blue-500/30 text-center hover:shadow-xl transition-all duration-300 h-full p-8">
+                <CardHeader>
+                  <div className="w-24 h-24 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6">
+                    <PlayCircle className="h-12 w-12 text-white" />
+                  </div>
+                  <CardTitle className="text-white text-3xl font-bold">Video Tutorials</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription className="text-gray-300 text-lg leading-relaxed mb-6">
+                    Step-by-step YouTube tutorials covering everything from ChatGPT to Midjourney and business automation. 
+                    Learn by doing real projects that you can add to your portfolio.
+                  </CardDescription>
+                  <div className="grid grid-cols-2 gap-4 text-sm">
+                    <div className="bg-gray-800/50 rounded-lg p-3">
+                      <p className="text-white font-semibold">30+ Tutorials</p>
+                    </div>
+                    <div className="bg-gray-800/50 rounded-lg p-3">
+                      <p className="text-white font-semibold">6 Categories</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            <Card className="bg-gray-800/50 backdrop-blur-sm border-gray-700 text-center hover:bg-gray-800/70 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            {/* Smaller Cards */}
+            <Card className="bg-gray-800/50 backdrop-blur-sm border-gray-700 text-center hover:bg-gray-800/70 transition-all duration-300">
               <CardHeader>
-                <div className="w-20 h-20 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <MessageSquare className="h-10 w-10 text-white" />
+                <div className="w-16 h-16 bg-green-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <MessageSquare className="h-8 w-8 text-white" />
                 </div>
-                <CardTitle className="text-white text-2xl font-bold">AI Companion</CardTitle>
+                <CardTitle className="text-white text-xl font-bold">AI Companion</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-gray-300 text-lg leading-relaxed">
+                <CardDescription className="text-gray-300 text-base leading-relaxed">
                   Get instant answers and personalized help from your AI companion while watching tutorials.
                 </CardDescription>
               </CardContent>
             </Card>
 
-            <Card className="bg-gray-800/50 backdrop-blur-sm border-gray-700 text-center hover:bg-gray-800/70 transition-all duration-300 hover:scale-105 hover:shadow-xl">
+            <Card className="bg-gray-800/50 backdrop-blur-sm border-gray-700 text-center hover:bg-gray-800/70 transition-all duration-300">
               <CardHeader>
-                <div className="w-20 h-20 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <Target className="h-10 w-10 text-white" />
+                <div className="w-16 h-16 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Target className="h-8 w-8 text-white" />
                 </div>
-                <CardTitle className="text-white text-2xl font-bold">Progress Tracking</CardTitle>
+                <CardTitle className="text-white text-xl font-bold">Progress Tracking</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-gray-300 text-lg leading-relaxed">
+                <CardDescription className="text-gray-300 text-base leading-relaxed">
                   Track your learning journey and build a portfolio of AI skills across 6 specialized categories.
                 </CardDescription>
               </CardContent>
@@ -212,10 +228,12 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Learning Categories */}
-      <section className="py-32 bg-black">
+      {/* Learning Categories - Overlapping Layout */}
+      <section className="py-32 bg-black relative overflow-hidden">
+        <div className="absolute top-40 right-20 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+        
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-20">
+          <div className="text-center mb-20 relative z-10">
             <h2 className="text-5xl md:text-6xl font-black text-white mb-8">
               6 Learning Paths to Master AI
             </h2>
@@ -224,26 +242,28 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 relative z-10">
             {[
-              { title: "General AI Use", desc: "Master ChatGPT, Claude, and essential AI fundamentals", icon: "🤖", color: "blue" },
-              { title: "Writing with AI", desc: "Blog posts, emails, and content creation mastery", icon: "✍️", color: "green" },
-              { title: "Image Generation", desc: "Midjourney, DALL-E, and visual AI creation", icon: "🎨", color: "purple" },
-              { title: "Business Automation", desc: "Workflow automation and productivity tools", icon: "⚡", color: "yellow" },
-              { title: "Data Analysis", desc: "AI-powered analytics and insights", icon: "📊", color: "red" },
-              { title: "Website Development", desc: "Build websites with AI assistance", icon: "💻", color: "indigo" }
-            ].map((category) => (
-              <Card key={category.title} className="bg-gray-800/30 backdrop-blur-sm border-gray-700 hover:bg-gray-800/50 transition-all duration-300 hover:scale-105 cursor-pointer group hover:shadow-xl">
-                <CardHeader>
-                  <div className={`w-20 h-20 bg-${category.color}-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                    <span className="text-3xl">{category.icon}</span>
-                  </div>
-                  <CardTitle className="text-white text-xl font-bold">{category.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-300 text-base leading-relaxed">{category.desc}</CardDescription>
-                </CardContent>
-              </Card>
+              { title: "General AI Use", desc: "Master ChatGPT, Claude, and essential AI fundamentals", icon: "🤖", color: "blue", link: "/general" },
+              { title: "Writing with AI", desc: "Blog posts, emails, and content creation mastery", icon: "✍️", color: "green", link: "/writing" },
+              { title: "Image Generation", desc: "Midjourney, DALL-E, and visual AI creation", icon: "🎨", color: "purple", link: "/images" },
+              { title: "Business Automation", desc: "Workflow automation and productivity tools", icon: "⚡", color: "yellow", link: "/business" },
+              { title: "Data Analysis", desc: "AI-powered analytics and insights", icon: "📊", color: "red", link: "/data" },
+              { title: "Website Development", desc: "Build websites with AI assistance", icon: "💻", color: "indigo", link: "/website" }
+            ].map((category, index) => (
+              <Link key={category.title} to={category.link}>
+                <Card className={`bg-gray-800/30 backdrop-blur-sm border-gray-700 hover:bg-gray-800/50 transition-all duration-300 hover:scale-105 cursor-pointer group hover:shadow-xl ${index % 2 === 1 ? 'lg:mt-8' : ''}`}>
+                  <CardHeader>
+                    <div className={`w-20 h-20 bg-${category.color}-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+                      <span className="text-3xl">{category.icon}</span>
+                    </div>
+                    <CardTitle className="text-white text-xl font-bold">{category.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <CardDescription className="text-gray-300 text-base leading-relaxed">{category.desc}</CardDescription>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
