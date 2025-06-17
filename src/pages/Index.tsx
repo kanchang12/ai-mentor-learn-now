@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -90,9 +89,6 @@ const Index = () => {
               HowToUseAI.uk
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/test-results">
-                <Button variant="ghost" size="sm">Test Results</Button>
-              </Link>
               <Link to="/login">
                 <Button variant="outline" size="sm">Login</Button>
               </Link>
