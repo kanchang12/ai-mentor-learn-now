@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -259,10 +260,10 @@ const Images = () => {
                       placeholder="Ask about AI image generation..."
                       value={chatMessage}
                       onChange={(e) => setChatMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
                       className="text-sm bg-white border-gray-300 text-[#22201d] placeholder:text-[#22201d] placeholder:opacity-50"
                     />
-                    <Button size="sm" onClick={sendMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
+                    <Button size="sm" onClick={sendChatMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>

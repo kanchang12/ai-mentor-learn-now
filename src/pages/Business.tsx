@@ -3,79 +3,85 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { 
-  PlayCircle, 
-  Clock, 
-  CheckCircle, 
   ArrowLeft,
-  MessageSquare,
-  Send,
   Bot,
   User,
   Minimize2,
   Maximize2,
-  Zap
+  Workflow,
+  Play,
+  Send,
+  Zap,
+  Settings
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { UsageMeter } from "@/components/UsageMeter";
+import { AffiliateCard } from "@/components/AffiliateCard";
 
 const Business = () => {
-  const [selectedVideo, setSelectedVideo] = useState(0);
+  const [workflow, setWorkflow] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [automationResult, setAutomationResult] = useState("");
   const [chatMessage, setChatMessage] = useState("");
   const [chatMinimized, setChatMinimized] = useState(false);
+  const { usageMinutes, isLimitReached, loading, trackUsage, trackAffiliateClick } = useUsageTracking('business');
+  
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
       sender: "ai",
-      message: "Hello! I'm your AI companion for business automation. I can help you understand Zapier, Make.com, and other automation tools. What would you like to learn about?",
+      message: "Hello! I'm your business automation assistant. I can help you create workflows with Make.com, Zapier, and other automation tools. What process would you like to automate?",
       timestamp: "Just now"
     }
   ]);
 
-  const tutorials = [
-    {
-      id: 1,
-      title: "Zapier Automation Workflows",
-      description: "Connect apps and automate repetitive tasks without coding",
-      duration: "22 min",
-      difficulty: "Beginner",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 2,
-      title: "Make.com Advanced Integrations",
-      description: "Build complex automation scenarios with visual workflow builder",
-      duration: "28 min",
-      difficulty: "Intermediate",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 3,
-      title: "AI Customer Service Chatbots",
-      description: "Create intelligent chatbots that handle customer inquiries 24/7",
-      duration: "25 min",
-      difficulty: "Advanced",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 4,
-      title: "Automated Content Publishing",
-      description: "Set up systems to publish content across multiple platforms automatically",
-      duration: "20 min",
-      difficulty: "Intermediate",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    }
-  ];
+  const createAutomation = async () => {
+    if (!workflow.trim() || isLimitReached) return;
 
-  const currentVideo = tutorials[selectedVideo];
+    setIsCreating(true);
+    setAutomationResult("");
 
-  const sendMessage = () => {
+    // Simulate automation creation
+    setTimeout(() => {
+      setAutomationResult(`Automation Workflow Created: "${workflow}"
+
+Suggested Automation Steps:
+1. Trigger: When new data is received
+2. Filter: Check if data meets criteria
+3. Transform: Format data for target system
+4. Action: Send to destination platform
+5. Notify: Alert team members
+
+Recommended Tools:
+• Make.com - For complex multi-step workflows
+• Zapier - For simple app integrations
+• Webhooks - For real-time data transfer
+
+Estimated Time Saved: 15 hours/week
+ROI: $2,400/month in productivity gains
+
+Ready-to-use Templates:
+- Email to Slack notification
+- CRM data sync
+- Social media posting automation
+- Invoice processing workflow
+
+Next Steps:
+1. Choose your automation platform
+2. Set up API connections
+3. Test the workflow
+4. Deploy and monitor`);
+      
+      trackUsage(2);
+      setIsCreating(false);
+    }, 3000);
+  };
+
+  const sendChatMessage = () => {
     if (!chatMessage.trim()) return;
 
     const newUserMessage = {
@@ -92,7 +98,7 @@ const Business = () => {
       const aiResponse = {
         id: Date.now() + 1,
         sender: "ai", 
-        message: "That's a great question about business automation! Here are some key strategies you should consider...",
+        message: "Great question! Business automation can save significant time. I recommend starting with repetitive tasks like data entry, email notifications, or social media posting. What specific process are you looking to automate?",
         timestamp: "Just now"
       };
       setChatMessages(prev => [...prev, aiResponse]);
@@ -113,147 +119,86 @@ const Business = () => {
                 </Button>
               </Link>
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-xl flex items-center justify-center border border-yellow-500/30">
+                <div className="w-10 h-10 bg-gradient-to-br from-orange-500/20 to-red-500/20 rounded-xl flex items-center justify-center border border-orange-500/30">
                   <span className="text-2xl">⚡</span>
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-[#22201d]">Business Automation</h1>
-                  <p className="text-sm text-[#22201d] opacity-70">Master workflow automation and productivity tools</p>
+                  <p className="text-sm text-[#22201d] opacity-70">Powered by Make.com & Zapier</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-[#e9ecf1] rounded-lg px-3 py-2">
-                <Clock className="h-4 w-4 text-[#22201d]" />
-                <span className="text-sm font-medium text-[#22201d]">23 minutes left</span>
-              </div>
-            </div>
+            <UsageMeter 
+              usageMinutes={usageMinutes} 
+              isLimitReached={isLimitReached} 
+              loading={loading} 
+            />
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Video Player Section */}
+          {/* Main Demo Section */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Video Player */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardContent className="p-0">
-                <div className="aspect-video bg-gray-100 rounded-t-[20px] flex items-center justify-center relative overflow-hidden">
-                  <iframe
-                    src={currentVideo.videoUrl}
-                    title={currentVideo.title}
-                    className="w-full h-full absolute inset-0"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                  <div className="absolute bottom-4 left-4 z-10 bg-black/60 rounded-lg px-3 py-1">
-                    <p className="text-white font-semibold text-sm">{currentVideo.title}</p>
-                    <p className="text-gray-200 text-xs">{currentVideo.duration}</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge variant="secondary" className="bg-[#e9ecf1] text-[#22201d]">
-                      {currentVideo.duration}
-                    </Badge>
-                    <div className="flex items-center space-x-2">
-                      <Badge className={`${currentVideo.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' : currentVideo.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                        {currentVideo.difficulty}
-                      </Badge>
-                      {currentVideo.completed && (
-                        <Badge className="bg-green-600 text-white">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Completed
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <h2 className="text-2xl font-bold text-[#22201d] mb-2">
-                    {currentVideo.title}
-                  </h2>
-                  <p className="text-[#22201d] opacity-70 mb-4">{currentVideo.description}</p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex space-x-2">
-                      <Button className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Mark Complete
-                      </Button>
-                      <Button variant="outline" className="border-gray-300 text-[#22201d] hover:bg-[#e9ecf1] rounded-[30px]">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Ask AI
-                      </Button>
-                    </div>
-                    <div className="text-sm text-[#22201d] opacity-70">
-                      Video {selectedVideo + 1} of {tutorials.length}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Progress Card */}
+            {/* Automation Demo */}
             <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
               <CardHeader>
-                <CardTitle className="text-lg text-[#22201d]">Your Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#22201d] opacity-70">Business Automation Progress</span>
-                    <span className="font-medium text-[#22201d]">0% complete</span>
-                  </div>
-                  <Progress value={0} className="h-2" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Video List */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg text-[#22201d]">Automation Tutorials</CardTitle>
+                <CardTitle className="text-xl text-[#22201d] flex items-center">
+                  <Workflow className="h-5 w-5 mr-2 text-[#6cae75]" />
+                  Automation Workflow Builder
+                </CardTitle>
                 <CardDescription className="text-[#22201d] opacity-70">
-                  {tutorials.length} videos in this category
+                  Describe your business process and get a custom automation workflow
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {tutorials.map((video, index) => (
-                    <div
-                      key={video.id}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                        selectedVideo === index 
-                          ? 'border-[#6cae75] bg-[#6cae75]/10' 
-                          : 'border-gray-200 hover:border-[#6cae75] hover:bg-[#e9ecf1]'
-                      }`}
-                      onClick={() => setSelectedVideo(index)}
+              <CardContent className="space-y-4">
+                <div className="flex space-x-2">
+                  <Textarea
+                    placeholder="Describe your automation needs... (e.g., 'When someone fills out our contact form, add them to CRM and send a welcome email', 'Sync new Shopify orders to our inventory system')"
+                    value={workflow}
+                    onChange={(e) => setWorkflow(e.target.value)}
+                    className="flex-1 min-h-[100px] text-[#22201d]"
+                    disabled={isLimitReached}
+                  />
+                  <div className="flex flex-col space-y-2">
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      disabled={isLimitReached}
+                      className="border-gray-300"
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          video.completed ? 'bg-[#6cae75]' : 'bg-gray-200'
-                        }`}>
-                          {video.completed ? (
-                            <CheckCircle className="h-4 w-4 text-white" />
-                          ) : (
-                            <PlayCircle className="h-4 w-4 text-[#22201d]" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#22201d] truncate">
-                            {video.title}
-                          </p>
-                          <p className="text-xs text-[#22201d] opacity-70">{video.duration}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      <Settings className="h-4 w-4 mr-2" />
+                      Templates
+                    </Button>
+                    <Button 
+                      onClick={createAutomation}
+                      disabled={!workflow.trim() || isCreating || isLimitReached}
+                      className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
+                    >
+                      {isCreating ? "Creating..." : "Create Workflow"}
+                    </Button>
+                  </div>
                 </div>
+                
+                {automationResult && (
+                  <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
+                    <h4 className="font-medium text-[#22201d] mb-2 flex items-center">
+                      <Zap className="h-4 w-4 mr-2" />
+                      Automation Plan:
+                    </h4>
+                    <pre className="text-[#22201d] whitespace-pre-wrap text-sm">{automationResult}</pre>
+                  </div>
+                )}
+
+                {isLimitReached && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm">
+                      You've reached your daily limit of 30 minutes. Upgrade for unlimited access!
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -266,8 +211,8 @@ const Business = () => {
                       <Bot className="h-4 w-4 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-base text-[#22201d]">AI Automation Coach</CardTitle>
-                      <CardDescription className="text-xs text-[#22201d] opacity-70">Ask questions about business automation</CardDescription>
+                      <CardTitle className="text-base text-[#22201d]">Automation Expert</CardTitle>
+                      <CardDescription className="text-xs text-[#22201d] opacity-70">Get help with business automation</CardDescription>
                     </div>
                   </div>
                   <Button
@@ -316,18 +261,67 @@ const Business = () => {
                   
                   <div className="flex space-x-2">
                     <Input
-                      placeholder="Ask about automation tools..."
+                      placeholder="Ask about business automation..."
                       value={chatMessage}
                       onChange={(e) => setChatMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
                       className="text-sm bg-white border-gray-300 text-[#22201d] placeholder:text-[#22201d] placeholder:opacity-50"
                     />
-                    <Button size="sm" onClick={sendMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
+                    <Button size="sm" onClick={sendChatMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
               )}
+            </Card>
+          </div>
+
+          {/* Sidebar with Affiliate Tools */}
+          <div className="space-y-6">
+            <AffiliateCard
+              title="Make.com"
+              description="Advanced automation platform for complex business workflows."
+              features={[
+                "Visual workflow builder",
+                "1000+ app integrations",
+                "Advanced data routing",
+                "Enterprise-grade security"
+              ]}
+              ctaText="Start Automating"
+              affiliateUrl="https://make.com/pricing"
+              commission="Referral bonus"
+              rating={4.8}
+              onAffiliateClick={trackAffiliateClick}
+              service="make"
+            />
+
+            <AffiliateCard
+              title="Zapier"
+              description="Simple automation tool to connect your favorite apps."
+              features={[
+                "5000+ app connections",
+                "Easy setup workflows",
+                "Multi-step automations",
+                "Team collaboration"
+              ]}
+              ctaText="Get Started"
+              affiliateUrl="https://zapier.com/pricing"
+              commission="Partner program"
+              rating={4.6}
+              onAffiliateClick={trackAffiliateClick}
+              service="zapier"
+            />
+
+            <Card className="bg-gradient-to-br from-[#6cae75]/10 to-[#5a9d64]/10 border border-[#6cae75]/30 rounded-[20px]">
+              <CardContent className="p-4 text-center">
+                <h3 className="font-semibold text-[#22201d] mb-2">Enterprise Automation</h3>
+                <p className="text-sm text-[#22201d] opacity-70 mb-3">
+                  Get unlimited workflows and priority support for your business.
+                </p>
+                <Button className="w-full bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
+                  Upgrade Now
+                </Button>
+              </CardContent>
             </Card>
           </div>
         </div>

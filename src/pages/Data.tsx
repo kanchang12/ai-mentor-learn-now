@@ -3,79 +3,78 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { 
-  PlayCircle, 
-  Clock, 
-  CheckCircle, 
   ArrowLeft,
-  MessageSquare,
-  Send,
   Bot,
   User,
   Minimize2,
   Maximize2,
-  BarChart3
+  BarChart3,
+  Upload,
+  Send,
+  FileSpreadsheet,
+  TrendingUp
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { UsageMeter } from "@/components/UsageMeter";
+import { AffiliateCard } from "@/components/AffiliateCard";
 
 const Data = () => {
-  const [selectedVideo, setSelectedVideo] = useState(0);
+  const [prompt, setPrompt] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState("");
   const [chatMessage, setChatMessage] = useState("");
   const [chatMinimized, setChatMinimized] = useState(false);
+  const { usageMinutes, isLimitReached, loading, trackUsage, trackAffiliateClick } = useUsageTracking('data');
+  
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
       sender: "ai",
-      message: "Hello! I'm your AI companion for data analysis. I can help you understand data analytics, visualization, and insights. What would you like to learn about?",
+      message: "Hello! I'm your AI data analysis assistant. I can help you analyze datasets, create visualizations, and extract insights from your data. Upload a CSV or describe your analysis needs!",
       timestamp: "Just now"
     }
   ]);
 
-  const tutorials = [
-    {
-      id: 1,
-      title: "ChatGPT Data Analysis",
-      description: "Analyze datasets and create insights using ChatGPT's advanced features",
-      duration: "24 min",
-      difficulty: "Beginner",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 2,
-      title: "Google Sheets AI Functions",
-      description: "Use AI-powered formulas and functions for data manipulation",
-      duration: "18 min",
-      difficulty: "Intermediate",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 3,
-      title: "Python Data Science with AI",
-      description: "Combine Python programming with AI for advanced analytics",
-      duration: "35 min",
-      difficulty: "Advanced",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 4,
-      title: "Automated Report Generation",
-      description: "Create dynamic reports that update automatically with new data",
-      duration: "26 min",
-      difficulty: "Intermediate",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    }
-  ];
+  const analyzeData = async () => {
+    if (!prompt.trim() || isLimitReached) return;
 
-  const currentVideo = tutorials[selectedVideo];
+    setIsAnalyzing(true);
+    setAnalysisResult("");
 
-  const sendMessage = () => {
+    // Simulate data analysis
+    setTimeout(() => {
+      setAnalysisResult(`Data Analysis Results for: "${prompt}"
+
+Key Insights:
+• Identified 3 major trends in your dataset
+• Found correlation coefficient of 0.82 between variables
+• Detected 5% outliers that may need attention
+• Recommended data cleaning steps for improved accuracy
+
+Statistical Summary:
+- Mean: 245.7
+- Median: 238.5
+- Standard Deviation: 42.3
+- Sample Size: 1,247 records
+
+Visualization suggestions:
+1. Time series plot for trend analysis
+2. Scatter plot for correlation visualization
+3. Box plot for outlier detection
+
+Next Steps:
+Consider implementing data preprocessing to handle missing values and normalize the distribution.`);
+      
+      trackUsage(2);
+      setIsAnalyzing(false);
+    }, 3000);
+  };
+
+  const sendChatMessage = () => {
     if (!chatMessage.trim()) return;
 
     const newUserMessage = {
@@ -92,7 +91,7 @@ const Data = () => {
       const aiResponse = {
         id: Date.now() + 1,
         sender: "ai", 
-        message: "That's a great question about data analysis! Here are some key insights and techniques you should know...",
+        message: "Great question about data analysis! I recommend starting with exploratory data analysis (EDA) to understand your dataset structure, then applying statistical methods based on your specific goals.",
         timestamp: "Just now"
       };
       setChatMessages(prev => [...prev, aiResponse]);
@@ -113,147 +112,86 @@ const Data = () => {
                 </Button>
               </Link>
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-500/20 to-pink-500/20 rounded-xl flex items-center justify-center border border-red-500/30">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center border border-blue-500/30">
                   <span className="text-2xl">📊</span>
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-[#22201d]">Data Analysis</h1>
-                  <p className="text-sm text-[#22201d] opacity-70">Master AI-powered analytics and insights</p>
+                  <p className="text-sm text-[#22201d] opacity-70">AI-powered data insights</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-[#e9ecf1] rounded-lg px-3 py-2">
-                <Clock className="h-4 w-4 text-[#22201d]" />
-                <span className="text-sm font-medium text-[#22201d]">26 minutes left</span>
-              </div>
-            </div>
+            <UsageMeter 
+              usageMinutes={usageMinutes} 
+              isLimitReached={isLimitReached} 
+              loading={loading} 
+            />
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Video Player Section */}
+          {/* Main Demo Section */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Video Player */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardContent className="p-0">
-                <div className="aspect-video bg-gray-100 rounded-t-[20px] flex items-center justify-center relative overflow-hidden">
-                  <iframe
-                    src={currentVideo.videoUrl}
-                    title={currentVideo.title}
-                    className="w-full h-full absolute inset-0"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                  <div className="absolute bottom-4 left-4 z-10 bg-black/60 rounded-lg px-3 py-1">
-                    <p className="text-white font-semibold text-sm">{currentVideo.title}</p>
-                    <p className="text-gray-200 text-xs">{currentVideo.duration}</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge variant="secondary" className="bg-[#e9ecf1] text-[#22201d]">
-                      {currentVideo.duration}
-                    </Badge>
-                    <div className="flex items-center space-x-2">
-                      <Badge className={`${currentVideo.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' : currentVideo.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                        {currentVideo.difficulty}
-                      </Badge>
-                      {currentVideo.completed && (
-                        <Badge className="bg-green-600 text-white">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Completed
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <h2 className="text-2xl font-bold text-[#22201d] mb-2">
-                    {currentVideo.title}
-                  </h2>
-                  <p className="text-[#22201d] opacity-70 mb-4">{currentVideo.description}</p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex space-x-2">
-                      <Button className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Mark Complete
-                      </Button>
-                      <Button variant="outline" className="border-gray-300 text-[#22201d] hover:bg-[#e9ecf1] rounded-[30px]">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Ask AI
-                      </Button>
-                    </div>
-                    <div className="text-sm text-[#22201d] opacity-70">
-                      Video {selectedVideo + 1} of {tutorials.length}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Progress Card */}
+            {/* Data Analysis Demo */}
             <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
               <CardHeader>
-                <CardTitle className="text-lg text-[#22201d]">Your Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#22201d] opacity-70">Data Analysis Progress</span>
-                    <span className="font-medium text-[#22201d]">0% complete</span>
-                  </div>
-                  <Progress value={0} className="h-2" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Video List */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg text-[#22201d]">Data Tutorials</CardTitle>
+                <CardTitle className="text-xl text-[#22201d] flex items-center">
+                  <BarChart3 className="h-5 w-5 mr-2 text-[#6cae75]" />
+                  AI Data Analyzer
+                </CardTitle>
                 <CardDescription className="text-[#22201d] opacity-70">
-                  {tutorials.length} videos in this category
+                  Upload data or describe your analysis needs for AI-powered insights
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {tutorials.map((video, index) => (
-                    <div
-                      key={video.id}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                        selectedVideo === index 
-                          ? 'border-[#6cae75] bg-[#6cae75]/10' 
-                          : 'border-gray-200 hover:border-[#6cae75] hover:bg-[#e9ecf1]'
-                      }`}
-                      onClick={() => setSelectedVideo(index)}
+              <CardContent className="space-y-4">
+                <div className="flex space-x-2">
+                  <Textarea
+                    placeholder="Describe your data analysis needs... (e.g., 'Analyze sales trends over the last quarter', 'Find correlations in customer behavior data')"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="flex-1 min-h-[100px] text-[#22201d]"
+                    disabled={isLimitReached}
+                  />
+                  <div className="flex flex-col space-y-2">
+                    <Button 
+                      variant="outline"
+                      size="sm"
+                      disabled={isLimitReached}
+                      className="border-gray-300"
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          video.completed ? 'bg-[#6cae75]' : 'bg-gray-200'
-                        }`}>
-                          {video.completed ? (
-                            <CheckCircle className="h-4 w-4 text-white" />
-                          ) : (
-                            <PlayCircle className="h-4 w-4 text-[#22201d]" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#22201d] truncate">
-                            {video.title}
-                          </p>
-                          <p className="text-xs text-[#22201d] opacity-70">{video.duration}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      <Upload className="h-4 w-4 mr-2" />
+                      Upload CSV
+                    </Button>
+                    <Button 
+                      onClick={analyzeData}
+                      disabled={!prompt.trim() || isAnalyzing || isLimitReached}
+                      className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
+                    >
+                      {isAnalyzing ? "Analyzing..." : "Analyze Data"}
+                    </Button>
+                  </div>
                 </div>
+                
+                {analysisResult && (
+                  <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
+                    <h4 className="font-medium text-[#22201d] mb-2 flex items-center">
+                      <TrendingUp className="h-4 w-4 mr-2" />
+                      Analysis Results:
+                    </h4>
+                    <pre className="text-[#22201d] whitespace-pre-wrap text-sm">{analysisResult}</pre>
+                  </div>
+                )}
+
+                {isLimitReached && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm">
+                      You've reached your daily limit of 30 minutes. Upgrade for unlimited access!
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -266,7 +204,7 @@ const Data = () => {
                       <Bot className="h-4 w-4 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-base text-[#22201d]">AI Data Analyst</CardTitle>
+                      <CardTitle className="text-base text-[#22201d]">Data Analysis Guide</CardTitle>
                       <CardDescription className="text-xs text-[#22201d] opacity-70">Ask questions about data analysis</CardDescription>
                     </div>
                   </div>
@@ -319,15 +257,64 @@ const Data = () => {
                       placeholder="Ask about data analysis..."
                       value={chatMessage}
                       onChange={(e) => setChatMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
                       className="text-sm bg-white border-gray-300 text-[#22201d] placeholder:text-[#22201d] placeholder:opacity-50"
                     />
-                    <Button size="sm" onClick={sendMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
+                    <Button size="sm" onClick={sendChatMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
               )}
+            </Card>
+          </div>
+
+          {/* Sidebar with Affiliate Tools */}
+          <div className="space-y-6">
+            <AffiliateCard
+              title="Observable"
+              description="Advanced data visualization and analysis platform for teams."
+              features={[
+                "Interactive notebooks",
+                "Real-time collaboration",
+                "Data visualization tools",
+                "JavaScript-based analytics"
+              ]}
+              ctaText="Start Free Trial"
+              affiliateUrl="https://observablehq.com/pricing"
+              commission="Referral bonus"
+              rating={4.6}
+              onAffiliateClick={trackAffiliateClick}
+              service="observable"
+            />
+
+            <AffiliateCard
+              title="Tableau"
+              description="Professional business intelligence and data visualization."
+              features={[
+                "Drag-and-drop interface",
+                "Advanced analytics",
+                "Dashboard creation",
+                "Enterprise integration"
+              ]}
+              ctaText="Get Started"
+              affiliateUrl="https://www.tableau.com/pricing"
+              commission="Partner program"
+              rating={4.7}
+              onAffiliateClick={trackAffiliateClick}
+              service="tableau"
+            />
+
+            <Card className="bg-gradient-to-br from-[#6cae75]/10 to-[#5a9d64]/10 border border-[#6cae75]/30 rounded-[20px]">
+              <CardContent className="p-4 text-center">
+                <h3 className="font-semibold text-[#22201d] mb-2">Premium Analytics</h3>
+                <p className="text-sm text-[#22201d] opacity-70 mb-3">
+                  Get advanced analytics features and unlimited data processing.
+                </p>
+                <Button className="w-full bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
+                  Upgrade Now
+                </Button>
+              </CardContent>
             </Card>
           </div>
         </div>
