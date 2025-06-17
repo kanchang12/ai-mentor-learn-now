@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +27,7 @@ const Index = () => {
     {
       id: "general",
       title: "General AI",
-      description: "Master ChatGPT, Claude, and essential AI tools for everyday productivity",
+      description: "Master AI tools using Replicate and OpenAI APIs for productivity",
       icon: "🤖",
       color: "from-blue-500/20 to-cyan-500/20",
       borderColor: "border-blue-500/30",
@@ -39,7 +40,7 @@ const Index = () => {
     {
       id: "writing",
       title: "AI Writing",
-      description: "Transform your writing with AI assistance for blogs, marketing, and content",
+      description: "Create content with Copy.ai API and advanced writing tools",
       icon: "✍️",
       color: "from-purple-500/20 to-pink-500/20",
       borderColor: "border-purple-500/30",
@@ -52,7 +53,7 @@ const Index = () => {
     {
       id: "images",
       title: "AI Images",
-      description: "Create stunning visuals with Midjourney, DALL-E, and image generation",
+      description: "Generate visuals with Stability AI and advanced image generation",
       icon: "🎨",
       color: "from-green-500/20 to-emerald-500/20",
       borderColor: "border-green-500/30",
@@ -65,7 +66,7 @@ const Index = () => {
     {
       id: "business",
       title: "Business Automation",
-      description: "Automate workflows, enhance productivity, and scale your business with AI",
+      description: "Automate workflows with Make.com API and productivity tools",
       icon: "⚡",
       color: "from-orange-500/20 to-red-500/20",
       borderColor: "border-orange-500/30",
@@ -78,7 +79,7 @@ const Index = () => {
     {
       id: "data",
       title: "Data Analysis",
-      description: "Analyze data, create insights, and make data-driven decisions",
+      description: "Analyze data with Observable and advanced visualization tools",
       icon: "📊",
       color: "from-indigo-500/20 to-blue-500/20",
       borderColor: "border-indigo-500/30",
@@ -91,7 +92,7 @@ const Index = () => {
     {
       id: "website",
       title: "Website Building",
-      description: "Build websites and web applications using AI-powered tools",
+      description: "Build with React/Next.js and deploy with Vercel/Railway",
       icon: "🌐",
       color: "from-teal-500/20 to-cyan-500/20",
       borderColor: "border-teal-500/30",
@@ -197,8 +198,8 @@ const Index = () => {
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-3xl mx-auto">
-            Learn ChatGPT, Midjourney, and cutting-edge AI tools through expert tutorials. 
-            Get your AI companion and 30 minutes daily access completely free.
+            Learn with working API demos for Replicate, OpenAI, Stability AI, Copy.ai and more. 
+            Get hands-on experience with 30 minutes daily access completely free.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
@@ -217,16 +218,16 @@ const Index = () => {
           {/* Stats */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-2xl mx-auto">
             <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600 mb-1">50+</div>
-              <div className="text-gray-600">Expert Tutorials</div>
+              <div className="text-3xl font-bold text-blue-600 mb-1">6</div>
+              <div className="text-gray-600">API Categories</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-indigo-600 mb-1">10k+</div>
-              <div className="text-gray-600">Active Learners</div>
+              <div className="text-3xl font-bold text-indigo-600 mb-1">Live</div>
+              <div className="text-gray-600">API Demos</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600 mb-1">24/7</div>
-              <div className="text-gray-600">AI Assistant</div>
+              <div className="text-3xl font-bold text-purple-600 mb-1">30min</div>
+              <div className="text-gray-600">Daily Free Access</div>
             </div>
           </div>
         </div>
@@ -325,11 +326,11 @@ const Index = () => {
         </div>
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Master AI?
+            Ready to Master AI APIs?
           </h2>
           <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-            Join thousands of learners who are already transforming their careers with AI. 
-            Start your journey today with 30 minutes of free daily access.
+            Start with working demos of real AI tools. Try Replicate, OpenAI, Stability AI, and more. 
+            Begin your journey today with 30 minutes of free daily access.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link to={user ? "/dashboard" : "/auth"}>
@@ -356,7 +357,7 @@ const Index = () => {
             <div className="text-2xl font-bold">HowToUseAI.uk</div>
           </div>
           <p className="text-gray-400 mb-8">
-            Empowering everyone to master AI tools for a better future
+            Learn AI through hands-on API demos and real-world examples
           </p>
           <div className="border-t border-gray-800 pt-8">
             <p className="text-gray-500">
