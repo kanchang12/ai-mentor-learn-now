@@ -57,7 +57,6 @@ export const CategoryPageLayout = ({ category, children, affiliateCards }: Categ
     if (!input.trim()) return;
 
     setIsLoading(true);
-    const startTime = Date.now();
 
     try {
       // Simulate AI response processing
@@ -129,7 +128,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards }: Categ
             </Card>
 
             {/* Voice Agent */}
-            <VoiceAgent category={category} />
+            <VoiceAgent />
           </div>
 
           {/* AI Chat Section */}
