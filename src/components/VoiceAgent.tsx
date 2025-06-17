@@ -21,8 +21,6 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
   const [isMinimized, setIsMinimized] = useState(true);
   const [isConnected, setIsConnected] = useState(false);
   const [vapiClient, setVapiClient] = useState<any>(null);
-  const [apiKey, setApiKey] = useState("");
-  const [agentId, setAgentId] = useState("");
   const { toast } = useToast();
 
   // Load VAPI script
@@ -31,6 +29,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
     script.src = 'https://cdn.jsdelivr.net/npm/@vapi-ai/web@latest/dist/index.js';
     script.onload = () => {
       console.log("VAPI script loaded");
+      initializeVapi();
     };
     document.head.appendChild(script);
 
@@ -39,11 +38,12 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
     };
   }, []);
 
-  // Initialize VAPI connection
-  useEffect(() => {
-    if (!window.Vapi || !apiKey || !agentId) return;
+  const initializeVapi = () => {
+    if (!window.Vapi) return;
 
     try {
+      // Initialize with admin-provided credentials (will be set via admin panel)
+      const apiKey = "admin_will_set_this"; // This will be replaced by admin
       const client = new window.Vapi(apiKey);
       setVapiClient(client);
 
@@ -101,44 +101,10 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
     } catch (error) {
       console.error("Failed to initialize VAPI:", error);
     }
-  }, [apiKey, agentId, isMinimized, toast]);
-
-  // Get API key and Agent ID from environment or prompt user
-  useEffect(() => {
-    // In production, these would come from environment variables or user input
-    // For now, we'll use placeholder values that the user needs to set
-    const storedApiKey = localStorage.getItem('vapi_api_key');
-    const storedAgentId = localStorage.getItem('vapi_agent_id');
-    
-    if (storedApiKey && storedAgentId) {
-      setApiKey(storedApiKey);
-      setAgentId(storedAgentId);
-    }
-  }, []);
-
-  const promptForCredentials = () => {
-    const apiKeyInput = prompt("Please enter your VAPI API Key:");
-    const agentIdInput = prompt("Please enter your VAPI Agent ID:");
-    
-    if (apiKeyInput && agentIdInput) {
-      setApiKey(apiKeyInput);
-      setAgentId(agentIdInput);
-      localStorage.setItem('vapi_api_key', apiKeyInput);
-      localStorage.setItem('vapi_agent_id', agentIdInput);
-      
-      toast({
-        title: "Credentials saved!",
-        description: "VAPI will now initialize with your credentials.",
-      });
-    }
   };
 
   const startCall = async () => {
-    if (!vapiClient || !agentId) {
-      if (!apiKey || !agentId) {
-        promptForCredentials();
-        return;
-      }
+    if (!vapiClient) {
       toast({
         title: "Not ready",
         description: "VAPI client is still initializing...",
@@ -150,7 +116,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
     try {
       // Start VAPI call with context
       await vapiClient.start({
-        assistantId: agentId,
+        assistantId: "admin_will_set_this", // This will be replaced by admin
         assistantOverrides: {
           firstMessage: getContextualGreeting(),
           variableValues: {
@@ -162,7 +128,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
       console.error("Failed to start VAPI call:", error);
       toast({
         title: "Failed to start call",
-        description: "Could not connect to voice assistant. Check your credentials.",
+        description: "Could not connect to voice assistant.",
         variant: "destructive",
       });
     }
@@ -183,7 +149,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
       general: "Hi! I'm Mat, your AI voice assistant. I can help you understand how to use AI chat tools effectively. What would you like to know?",
       writing: "Hello! I'm Mat. I can guide you through AI writing tools and help you create better content. Would you like tips on writing prompts or content structure?",
       images: "Hi there! I'm Mat, your voice guide for AI image generation. I can help you write better prompts and understand different artistic styles. What can I help you with?",
-      business: "Welcome! I'm Mat, and I'm here to help you automate your business processes. I can guide you through workflow automation and productivity tools.",
+      book: "Hi! I'm Mat, your book writing assistant. I can help you structure your book, develop characters, and guide you through the writing process. What would you like to work on?",
       data: "Hello! I'm Mat, your data analysis assistant. I can help you understand how to use AI for data insights and visualization. What would you like to explore?",
       website: "Hi! I'm Mat, your website building guide. I can help you navigate AI-powered website builders and design tools. How can I assist you today?",
       homepage: "Welcome to HowToUseAI! I'm Mat, your voice guide. I can help you choose the right AI tools and get started with any category. What interests you most?",
@@ -222,8 +188,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
               <div>
                 <h3 className="font-semibold text-gray-800">Mat</h3>
                 <p className="text-xs text-gray-500">
-                  {!apiKey || !agentId ? "Setup Required" :
-                   isConnected ? "Connected & Ready" : 
+                  {isConnected ? "Connected & Ready" : 
                    vapiClient ? "Ready to Connect" : "Initializing..."}
                 </p>
               </div>
@@ -256,8 +221,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
             </div>
 
             <div className="text-sm text-gray-600">
-              {!apiKey || !agentId ? "Setup VAPI credentials" :
-               isListening ? "Listening..." : 
+              {isListening ? "Listening..." : 
                isSpeaking ? "Mat is speaking..." : 
                isConnected ? "Connected - Say something!" :
                "Click to start voice chat"}
@@ -266,11 +230,11 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
             <div className="flex space-x-2 justify-center">
               {!isConnected ? (
                 <Button
-                  onClick={(!apiKey || !agentId) ? promptForCredentials : startCall}
+                  onClick={startCall}
                   className="bg-blue-500 hover:bg-blue-600 text-white"
                 >
                   <Mic className="h-4 w-4 mr-2" />
-                  {!apiKey || !agentId ? "Setup VAPI" : "Start Voice Chat"}
+                  Start Voice Chat
                 </Button>
               ) : (
                 <Button
@@ -284,10 +248,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
             </div>
 
             <p className="text-xs text-gray-500">
-              {!apiKey || !agentId ? 
-                "Enter your VAPI credentials to enable voice chat" :
-                `I can help guide you through ${pageContext} AI tools and answer your questions.`
-              }
+              I can help guide you through {pageContext} AI tools and answer your questions.
             </p>
           </div>
         </CardContent>
