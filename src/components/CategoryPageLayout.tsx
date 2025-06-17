@@ -20,6 +20,7 @@ interface CategoryPageLayoutProps {
     buttonText: string;
     buttonUrl: string;
     service: string;
+    features?: string[];
   }>;
   // Allow additional props that pages might pass
   [key: string]: any;
@@ -201,8 +202,10 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
                   key={index}
                   title={card.title}
                   description={card.description}
+                  features={card.features || []}
                   ctaText={card.buttonText}
                   affiliateUrl={card.buttonUrl}
+                  service={card.service}
                   onAffiliateClick={() => trackAffiliateClick(card.service)}
                 />
               ))}
