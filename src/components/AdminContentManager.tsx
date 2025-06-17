@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,22 @@ const AdminContentManager = () => {
 
   const handleUpdateContent = (field: string, value: string) => {
     updatePageContent(selectedPage, { [field]: value });
+  };
+
+  const extractVideoUrlFromIframe = (iframeCode: string) => {
+    const srcMatch = iframeCode.match(/src="([^"]*)"/);
+    return srcMatch ? srcMatch[1] : "";
+  };
+
+  const handleIframeCodeChange = (iframeCode: string) => {
+    const extractedUrl = extractVideoUrlFromIframe(iframeCode);
+    if (extractedUrl) {
+      updatePageContent(selectedPage, { videoUrl: extractedUrl });
+      toast({
+        title: "Success",
+        description: "Video URL extracted from iframe code and updated",
+      });
+    }
   };
 
   const handleSaveContent = async () => {
@@ -154,8 +169,23 @@ const AdminContentManager = () => {
             />
           </div>
 
+          {/* New Iframe Embed Code Field */}
           <div className="space-y-2">
-            <Label htmlFor="videoUrl">Video URL (YouTube Embed)</Label>
+            <Label htmlFor="iframeCode">YouTube Iframe Embed Code</Label>
+            <Textarea
+              id="iframeCode"
+              placeholder="Paste your complete YouTube iframe embed code here..."
+              onChange={(e) => handleIframeCodeChange(e.target.value)}
+              rows={4}
+              className="font-mono text-sm"
+            />
+            <p className="text-xs text-gray-500">
+              Paste the complete iframe code from YouTube (e.g., &lt;iframe width="560" height="315" src="..."&gt;&lt;/iframe&gt;). The video URL will be automatically extracted.
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="videoUrl">Video URL (Auto-extracted or Manual)</Label>
             <Input
               id="videoUrl"
               value={currentPage?.videoUrl || ""}
@@ -163,7 +193,7 @@ const AdminContentManager = () => {
               placeholder="https://www.youtube.com/embed/VIDEO_ID"
             />
             <p className="text-xs text-gray-500">
-              Use format: https://www.youtube.com/embed/VIDEO_ID (e.g., https://www.youtube.com/embed/dQw4w9WgXcQ)
+              This field is auto-populated when you paste iframe code above, or you can enter manually.
             </p>
           </div>
 
@@ -212,7 +242,19 @@ const AdminContentManager = () => {
                 <h3 className="text-lg font-bold mb-2">{currentPage?.title}</h3>
                 <p className="text-sm text-gray-600 mb-4">{currentPage?.description}</p>
                 <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center mb-2">
-                  <span className="text-gray-500">Video: {currentPage?.videoUrl}</span>
+                  {currentPage?.videoUrl ? (
+                    <iframe
+                      src={currentPage.videoUrl}
+                      title="Preview"
+                      className="w-full h-full rounded-lg"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerPolicy="strict-origin-when-cross-origin"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <span className="text-gray-500">No video URL set</span>
+                  )}
                 </div>
                 <h4 className="font-semibold text-sm">{currentPage?.videoTitle}</h4>
                 <p className="text-xs text-gray-600">{currentPage?.videoDescription}</p>
