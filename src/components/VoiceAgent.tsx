@@ -167,12 +167,12 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
       <div className="fixed bottom-4 right-4 z-50">
         <Button
           onClick={() => setIsMinimized(false)}
-          className="rounded-full w-14 h-14 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
+          className="rounded-full w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
           size="icon"
         >
           <div className="flex flex-col items-center">
-            <Mic className="h-5 w-5 text-white" />
-            <span className="text-xs text-white mt-1">Mat</span>
+            <Mic className="h-6 w-6 text-white" />
+            <span className="text-sm text-white mt-1">Mat</span>
           </div>
         </Button>
       </div>
@@ -185,8 +185,8 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold">M</span>
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-lg">M</span>
               </div>
               <div>
                 <h3 className="font-semibold text-gray-800">Mat</h3>
@@ -209,16 +209,16 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
           <div className="text-center space-y-3">
             <div className="flex justify-center">
               {isListening ? (
-                <div className="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
-                  <Mic className="h-8 w-8 text-white" />
+                <div className="w-24 h-24 bg-red-500 rounded-full flex items-center justify-center animate-pulse">
+                  <Mic className="h-10 w-10 text-white" />
                 </div>
               ) : isSpeaking ? (
-                <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
-                  <Volume2 className="h-8 w-8 text-white" />
+                <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center animate-pulse">
+                  <Volume2 className="h-10 w-10 text-white" />
                 </div>
               ) : (
-                <div className="w-20 h-20 bg-gray-300 rounded-full flex items-center justify-center">
-                  <Mic className="h-8 w-8 text-gray-600" />
+                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center">
+                  <Mic className="h-10 w-10 text-gray-600" />
                 </div>
               )}
             </div>
@@ -236,7 +236,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
                   onClick={startCall}
                   className="bg-blue-500 hover:bg-blue-600 text-white"
                 >
-                  <Mic className="h-4 w-4 mr-2" />
+                  <Mic className="h-5 w-5 mr-2" />
                   Start Voice Chat
                 </Button>
               ) : (
@@ -244,7 +244,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
                   onClick={endCall}
                   variant="destructive"
                 >
-                  <MicOff className="h-4 w-4 mr-2" />
+                  <MicOff className="h-5 w-5 mr-2" />
                   End Call
                 </Button>
               )}
