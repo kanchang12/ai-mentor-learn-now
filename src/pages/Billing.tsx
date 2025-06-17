@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowLeft, CreditCard, Download } from "lucide-react";
@@ -10,23 +9,28 @@ const Billing = () => {
 
   const handleUpgradeToPro = () => {
     toast({
-      title: "Upgrade to Pro",
-      description: "Pro plan upgrade feature coming soon! Contact support for early access.",
+      title: "Redirecting to PayPal",
+      description: "Opening secure payment gateway...",
     });
+    // Replace with your actual PayPal payment link
+    window.open('https://www.paypal.com/paypalme/yourusername/19', '_blank');
   };
 
   const handleContactSales = () => {
     toast({
       title: "Contact Sales",
-      description: "Enterprise sales team will be in touch soon!",
+      description: "Opening contact form...",
     });
+    window.open('mailto:sales@howtouseai.com?subject=Enterprise Plan Inquiry', '_blank');
   };
 
   const handleAddPaymentMethod = () => {
     toast({
-      title: "Add Payment Method",
-      description: "Payment method setup coming soon! You'll be notified when available.",
+      title: "Payment Setup",
+      description: "Opening PayPal payment setup...",
     });
+    // Replace with your PayPal payment method setup link
+    window.open('https://www.paypal.com/signin', '_blank');
   };
 
   return (
