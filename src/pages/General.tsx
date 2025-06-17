@@ -1,33 +1,103 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { AffiliateCard } from "@/components/AffiliateCard";
 import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { useToast } from "@/hooks/use-toast";
 
 const General = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [apiKey, setApiKey] = useState("");
   const { trackAffiliateClick } = useUsageTracking('general');
+  const { toast } = useToast();
 
   const handleSubmit = async () => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a prompt",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!apiKey.trim()) {
+      toast({
+        title: "Error", 
+        description: "Please enter your Perplexity API key",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsLoading(true);
     setResponse("");
     
-    setTimeout(() => {
-      setResponse("This is a demo response from the AI. In the full version, this would connect to OpenAI's API to provide real AI responses.");
+    try {
+      const apiResponse = await fetch('https://api.perplexity.ai/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-sonar-small-128k-online',
+          messages: [
+            {
+              role: 'system',
+              content: 'Be precise and concise.'
+            },
+            {
+              role: 'user',
+              content: prompt
+            }
+          ],
+          temperature: 0.2,
+          top_p: 0.9,
+          max_tokens: 1000,
+          return_images: false,
+          return_related_questions: false,
+          frequency_penalty: 1,
+          presence_penalty: 0
+        }),
+      });
+
+      if (!apiResponse.ok) {
+        throw new Error(`API request failed: ${apiResponse.status}`);
+      }
+
+      const data = await apiResponse.json();
+      setResponse(data.choices[0].message.content);
+    } catch (error) {
+      console.error('Error calling Perplexity API:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get AI response. Please check your API key.",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
 
   const demoContent = (
     <div className="space-y-4">
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Perplexity API Key</label>
+        <Textarea
+          placeholder="Enter your Perplexity API key..."
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          className="min-h-[60px] text-[#22201d]"
+          type="password"
+        />
+      </div>
+      
       <Textarea
         placeholder="Ask AI anything... (e.g., 'Write a professional email', 'Explain quantum computing', 'Help me plan a vacation')"
         value={prompt}
@@ -36,7 +106,7 @@ const General = () => {
       />
       <Button 
         onClick={handleSubmit}
-        disabled={!prompt.trim() || isLoading}
+        disabled={!prompt.trim() || !apiKey.trim() || isLoading}
         className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
       >
         {isLoading ? "AI is thinking..." : "Ask AI"}
@@ -65,20 +135,20 @@ const General = () => {
       demoContent={demoContent}
     >
       <AffiliateCard
-        title="ChatGPT Plus"
-        description="Get priority access and faster responses with ChatGPT Plus subscription."
+        title="Perplexity Pro"
+        description="Get access to Claude-3, GPT-4, and real-time web search capabilities."
         features={[
-          "Priority access during peak times",
-          "Faster response speeds", 
-          "Access to GPT-4",
-          "Early access to new features"
+          "Access to Claude-3 and GPT-4",
+          "Real-time web search",
+          "Unlimited usage",
+          "Priority support"
         ]}
-        ctaText="Upgrade to Plus"
-        affiliateUrl="https://chat.openai.com/auth/login"
-        commission="$5 per signup"
+        ctaText="Get Perplexity Pro"
+        affiliateUrl="https://www.perplexity.ai/pro"
+        commission="Commission available"
         rating={4.8}
         onAffiliateClick={trackAffiliateClick}
-        service="chatgpt"
+        service="perplexity"
       />
     </CategoryPageLayout>
   );

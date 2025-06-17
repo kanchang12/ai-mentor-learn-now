@@ -8,6 +8,7 @@ import { PenTool } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { AffiliateCard } from "@/components/AffiliateCard";
 import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { useToast } from "@/hooks/use-toast";
 
 const Writing = () => {
   const [contentType, setContentType] = useState("");
@@ -15,17 +16,29 @@ const Writing = () => {
   const [generatedContent, setGeneratedContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const { trackAffiliateClick } = useUsageTracking('writing');
+  const { toast } = useToast();
 
   const generateContent = async () => {
-    if (!contentType || !topic.trim()) return;
+    if (!contentType || !topic.trim()) {
+      toast({
+        title: "Error",
+        description: "Please select content type and enter a topic",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setIsGenerating(true);
     setGeneratedContent("");
     
+    // Redirect to Jasper AI for content generation
+    const jasperUrl = `https://www.jasper.ai/templates/${contentType}?topic=${encodeURIComponent(topic)}`;
+    window.open(jasperUrl, '_blank');
+    
     setTimeout(() => {
-      setGeneratedContent(`This is a demo ${contentType} about ${topic}. In the full version, this would generate professional content using AI writing tools like Jasper, Copy.ai, or OpenAI's API.`);
+      setGeneratedContent(`Content generation has been opened in Jasper AI. Please complete your ${contentType} about "${topic}" in the new tab and copy the result back here if needed.`);
       setIsGenerating(false);
-    }, 3000);
+    }, 2000);
   };
 
   const demoContent = (
@@ -55,12 +68,12 @@ const Writing = () => {
         disabled={!contentType || !topic.trim() || isGenerating}
         className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
       >
-        {isGenerating ? "Writing..." : "Generate Content"}
+        {isGenerating ? "Opening Jasper..." : "Generate with Jasper AI"}
       </Button>
       
       {generatedContent && (
         <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
-          <h4 className="font-medium text-[#22201d] mb-2">Generated Content:</h4>
+          <h4 className="font-medium text-[#22201d] mb-2">Status:</h4>
           <p className="text-[#22201d] opacity-80">{generatedContent}</p>
         </div>
       )}

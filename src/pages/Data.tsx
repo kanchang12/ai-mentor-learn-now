@@ -1,72 +1,114 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BarChart3 } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { AffiliateCard } from "@/components/AffiliateCard";
 import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { useToast } from "@/hooks/use-toast";
 
 const Data = () => {
-  const [dataSource, setDataSource] = useState("");
-  const [analysisType, setAnalysisType] = useState("");
-  const [analysisResult, setAnalysisResult] = useState("");
+  const [dataQuery, setDataQuery] = useState("");
+  const [apiKey, setApiKey] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisResult, setAnalysisResult] = useState("");
   const { trackAffiliateClick } = useUsageTracking('data');
+  const { toast } = useToast();
 
   const analyzeData = async () => {
-    if (!dataSource || !analysisType) return;
-    
+    if (!dataQuery.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your data analysis request",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!apiKey.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter your Claude API key",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsAnalyzing(true);
     setAnalysisResult("");
-    
-    setTimeout(() => {
-      setAnalysisResult(`Analysis complete for ${dataSource} using ${analysisType}. This demo shows how AI can help you extract insights from your data automatically.`);
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-sonnet-20240229',
+          max_tokens: 2000,
+          messages: [
+            {
+              role: 'user',
+              content: `You are a data analysis expert. Please analyze the following data request and provide insights: ${dataQuery}`
+            }
+          ]
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API request failed: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setAnalysisResult(data.content[0].text);
+    } catch (error) {
+      console.error('Error calling Claude API:', error);
+      toast({
+        title: "Error",
+        description: "Failed to analyze data. Please check your API key.",
+        variant: "destructive",
+      });
+    } finally {
       setIsAnalyzing(false);
-    }, 3000);
+    }
   };
 
   const demoContent = (
     <div className="space-y-4">
-      <Select value={dataSource} onValueChange={setDataSource}>
-        <SelectTrigger>
-          <SelectValue placeholder="Select your data source" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="excel">Excel Spreadsheet</SelectItem>
-          <SelectItem value="csv">CSV File</SelectItem>
-          <SelectItem value="database">SQL Database</SelectItem>
-          <SelectItem value="google-sheets">Google Sheets</SelectItem>
-          <SelectItem value="api">API Data</SelectItem>
-        </SelectContent>
-      </Select>
+      <div className="space-y-2">
+        <label className="text-sm font-medium">Claude API Key</label>
+        <Input
+          placeholder="Enter your Anthropic Claude API key..."
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          className="text-[#22201d]"
+          type="password"
+        />
+      </div>
       
-      <Select value={analysisType} onValueChange={setAnalysisType}>
-        <SelectTrigger>
-          <SelectValue placeholder="What type of analysis?" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="trend-analysis">Trend Analysis</SelectItem>
-          <SelectItem value="predictive-modeling">Predictive Modeling</SelectItem>
-          <SelectItem value="data-visualization">Data Visualization</SelectItem>
-          <SelectItem value="statistical-summary">Statistical Summary</SelectItem>
-          <SelectItem value="anomaly-detection">Anomaly Detection</SelectItem>
-        </SelectContent>
-      </Select>
+      <Textarea
+        placeholder="Describe your data analysis request... (e.g., 'Analyze sales trends', 'Find patterns in customer data', 'Statistical analysis of survey results')"
+        value={dataQuery}
+        onChange={(e) => setDataQuery(e.target.value)}
+        className="min-h-[100px] text-[#22201d]"
+      />
       
       <Button 
         onClick={analyzeData}
-        disabled={!dataSource || !analysisType || isAnalyzing}
+        disabled={!dataQuery.trim() || !apiKey.trim() || isAnalyzing}
         className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
       >
-        {isAnalyzing ? "Analyzing..." : "Analyze Data"}
+        {isAnalyzing ? "Analyzing..." : "Analyze with Claude"}
       </Button>
       
       {analysisResult && (
         <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
           <h4 className="font-medium text-[#22201d] mb-2">Analysis Result:</h4>
-          <p className="text-[#22201d] opacity-80">{analysisResult}</p>
+          <p className="text-[#22201d] opacity-80 whitespace-pre-wrap">{analysisResult}</p>
         </div>
       )}
     </div>
@@ -75,31 +117,31 @@ const Data = () => {
   return (
     <CategoryPageLayout
       category="data"
-      title="Data Analysis with AI"
-      description="Extract insights from your data"
-      icon={<BarChart3 className="h-5 w-5 text-indigo-600" />}
-      videoId="dUFIj8JGz0A"
-      videoTitle="AI Data Analysis Masterclass"
-      videoDescription="Learn to analyze data and create insights with AI tools"
+      title="AI Data Analysis"
+      description="Extract insights with AI"
+      icon={<BarChart3 className="h-5 w-5 text-blue-600" />}
+      videoId="A0HHinUgdn4"
+      videoTitle="AI Data Analysis Mastery"
+      videoDescription="Learn to analyze data and extract insights with Claude AI"
       demoTitle="Try Data Analysis"
-      demoDescription="Upload your data and get AI-powered insights"
+      demoDescription="Get AI-powered insights from your data"
       demoContent={demoContent}
     >
       <AffiliateCard
-        title="Tableau"
-        description="Professional data visualization and business intelligence platform."
+        title="Claude Pro"
+        description="Advanced AI assistant for complex data analysis and reasoning tasks."
         features={[
-          "Advanced visualizations",
-          "Real-time data connections",
-          "AI-powered insights",
-          "Enterprise collaboration"
+          "Advanced reasoning",
+          "Large context window",
+          "Data analysis expertise",
+          "Priority access"
         ]}
-        ctaText="Start Free Trial"
-        affiliateUrl="https://www.tableau.com"
-        commission="$100 per sale"
-        rating={4.5}
+        ctaText="Get Claude Pro"
+        affiliateUrl="https://claude.ai/upgrade"
+        commission="Available through Anthropic partners"
+        rating={4.9}
         onAffiliateClick={trackAffiliateClick}
-        service="tableau"
+        service="claude"
       />
     </CategoryPageLayout>
   );
