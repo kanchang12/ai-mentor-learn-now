@@ -1,125 +1,112 @@
 
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Save, Video, FileText } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 
-interface ContentItem {
+interface PageContent {
   id: string;
-  category: string;
   title: string;
   description: string;
-  video_id: string;
-  video_title: string;
-  video_description: string;
-  demo_title: string;
-  demo_description: string;
+  videoUrl: string;
+  videoTitle: string;
+  videoDescription: string;
 }
 
-export const AdminContentManager = () => {
-  const [contentItems, setContentItems] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
+const AdminContentManager = () => {
+  const [pages, setPages] = useState<PageContent[]>([]);
+  const [selectedPage, setSelectedPage] = useState<string>("homepage");
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
+  // Default content for all pages
+  const defaultContent: Record<string, PageContent> = {
+    homepage: {
+      id: "homepage",
+      title: "Master AI Tutorials, AI Writing & AI Image Editing",
+      description: "Learn the most powerful AI tools through step-by-step tutorials. Master ChatGPT, Midjourney, Jasper AI, and more with hands-on practice and expert guidance.",
+      videoUrl: "https://www.youtube.com/embed/QH2-TGUlwu4",
+      videoTitle: "Complete AI Mastery Course - 2024 Edition",
+      videoDescription: "Everything you need to know about AI tutorials, AI writing tools, and AI image editing in one comprehensive guide. Perfect for beginners and advanced users."
+    },
+    general: {
+      id: "general",
+      title: "AI Tutorials - Master ChatGPT and AI Chat Tools",
+      description: "Learn how to use ChatGPT and other AI chat tools effectively with step-by-step tutorials and practical examples.",
+      videoUrl: "https://www.youtube.com/embed/JTxsNm9IdYU",
+      videoTitle: "Complete ChatGPT Tutorial - From Beginner to Expert",
+      videoDescription: "Master ChatGPT with this comprehensive tutorial covering prompt engineering, advanced techniques, and real-world applications."
+    },
+    writing: {
+      id: "writing",
+      title: "AI Writing Tools - Master Jasper AI and Content Creation",
+      description: "Learn to create professional content using AI writing assistants like Jasper AI, Copy.ai, and more.",
+      videoUrl: "https://www.youtube.com/embed/VjVyUh_pKnY",
+      videoTitle: "AI Writing Mastery - Complete Guide to AI Content Creation",
+      videoDescription: "Learn how to create engaging content, blog posts, and marketing copy using advanced AI writing tools and techniques."
+    },
+    images: {
+      id: "images",
+      title: "AI Image Editing - Master Midjourney and DALL-E",
+      description: "Create stunning visuals with AI image generation and editing tools including Midjourney, DALL-E, and Stable Diffusion.",
+      videoUrl: "https://www.youtube.com/embed/35RaoKs1hJU",
+      videoTitle: "AI Image Generation Masterclass - Midjourney & DALL-E Guide",
+      videoDescription: "Complete guide to AI image generation covering Midjourney, DALL-E, prompt engineering, and advanced techniques for creating professional visuals."
+    },
+    business: {
+      id: "business",
+      title: "Business AI Automation - Streamline Your Workflow",
+      description: "Automate your business processes with AI tools and increase productivity with intelligent automation solutions.",
+      videoUrl: "https://www.youtube.com/embed/d4yCWBzIhqs",
+      videoTitle: "Business AI Automation Complete Guide",
+      videoDescription: "Learn how to implement AI automation in your business, streamline workflows, and boost productivity with the latest AI tools."
+    },
+    data: {
+      id: "data",
+      title: "AI Data Analysis - Extract Insights with Artificial Intelligence",
+      description: "Learn to analyze data and extract valuable insights using AI-powered analytics tools and machine learning techniques.",
+      videoUrl: "https://www.youtube.com/embed/aircAruvnKk",
+      videoTitle: "AI Data Analysis Mastery Course",
+      videoDescription: "Master data analysis with AI tools, learn machine learning basics, and discover how to extract actionable insights from your data."
+    },
+    website: {
+      id: "website",
+      title: "AI Website Builder - Create Professional Sites with AI",
+      description: "Build professional websites using AI-powered tools and platforms that automate design and development processes.",
+      videoUrl: "https://www.youtube.com/embed/gUmBf2HfUUY",
+      videoTitle: "AI Website Building Complete Tutorial",
+      videoDescription: "Learn to build professional websites using AI tools, from design to deployment, with practical examples and best practices."
+    }
+  };
+
   useEffect(() => {
-    loadContent();
+    // Initialize with default content
+    const initialPages = Object.values(defaultContent);
+    setPages(initialPages);
   }, []);
 
-  const loadContent = async () => {
-    // For now, use sample data - in production this would fetch from Supabase
-    const sampleContent: ContentItem[] = [
-      {
-        id: '1',
-        category: 'general',
-        title: 'General AI Chat',
-        description: 'Your AI assistant for any task',
-        video_id: 'QH2-TGUlwu4',
-        video_title: 'Master ChatGPT in 15 Minutes',
-        video_description: 'Learn how to write perfect prompts and get amazing results from AI',
-        demo_title: 'Try AI Chat',
-        demo_description: 'Ask AI anything and get instant intelligent responses'
-      },
-      {
-        id: '2',
-        category: 'writing',
-        title: 'AI Writing Assistant',
-        description: 'Create professional content with AI',
-        video_id: 'nKIu9yen5nc',
-        video_title: 'AI Writing Masterclass',
-        video_description: 'Learn to create engaging content with AI writing tools',
-        demo_title: 'Try AI Writing',
-        demo_description: 'Generate professional content for any purpose'
-      },
-      {
-        id: '3',
-        category: 'images',
-        title: 'AI Image Generator',
-        description: 'Create stunning visuals with AI',
-        video_id: '8MNb_nw5dQo',
-        video_title: 'AI Art Generation Complete Guide',
-        video_description: 'Master Midjourney, DALL-E, and Stable Diffusion',
-        demo_title: 'Try Image Generation',
-        demo_description: 'Create amazing images from text descriptions'
-      },
-      {
-        id: '4',
-        category: 'business',
-        title: 'Business Automation',
-        description: 'Automate workflows with AI',
-        video_id: '5dTK8qZHbhQ',
-        video_title: 'Business Automation with AI',
-        video_description: 'Learn to automate your business processes with AI tools',
-        demo_title: 'Try Automation Planner',
-        demo_description: 'Get a custom automation plan for your business'
-      },
-      {
-        id: '5',
-        category: 'data',
-        title: 'Data Analysis with AI',
-        description: 'Extract insights from your data',
-        video_id: 'dUFIj8JGz0A',
-        video_title: 'AI Data Analysis Masterclass',
-        video_description: 'Learn to analyze data and create insights with AI tools',
-        demo_title: 'Try Data Analysis',
-        demo_description: 'Upload your data and get AI-powered insights'
-      },
-      {
-        id: '6',
-        category: 'website',
-        title: 'AI Website Builder',
-        description: 'Build websites with AI assistance',
-        video_id: 'HXV3zeQKqGY',
-        video_title: 'Build Websites with AI',
-        video_description: 'Learn to create professional websites using AI tools',
-        demo_title: 'Try Website Builder',
-        demo_description: 'Generate a complete website with AI assistance'
-      }
-    ];
-    
-    setContentItems(sampleContent);
-    setLoading(false);
+  const handleUpdateContent = (pageId: string, field: keyof PageContent, value: string) => {
+    setPages(prev => prev.map(page => 
+      page.id === pageId 
+        ? { ...page, [field]: value }
+        : page
+    ));
   };
 
-  const updateContent = (id: string, field: string, value: string) => {
-    setContentItems(items => 
-      items.map(item => 
-        item.id === id ? { ...item, [field]: value } : item
-      )
-    );
-  };
-
-  const saveContent = async (item: ContentItem) => {
+  const handleSaveContent = async (pageId: string) => {
+    setLoading(true);
     try {
-      // In production, this would save to Supabase
-      console.log('Saving content:', item);
+      // In a real implementation, this would save to a database
+      // For now, we'll just show a success message
+      console.log('Saving content for page:', pageId);
       
       toast({
         title: "Success",
-        description: `${item.title} content updated successfully`,
+        description: `Content updated for ${pageId} page`,
       });
     } catch (error) {
       console.error('Error saving content:', error);
@@ -128,123 +115,126 @@ export const AdminContentManager = () => {
         description: "Failed to save content",
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (loading) {
-    return <div className="text-center py-8">Loading content...</div>;
-  }
+  const currentPage = pages.find(page => page.id === selectedPage) || defaultContent[selectedPage];
 
   return (
     <div className="space-y-6">
-      {contentItems.map((item) => (
-        <Card key={item.id} className="bg-white border border-gray-200 rounded-[20px]">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="capitalize text-xl">{item.category}</CardTitle>
-              <Button 
-                size="sm" 
-                onClick={() => saveContent(item)}
-                className="bg-[#6cae75] hover:bg-[#5a9d64]"
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
-            </div>
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            {/* Page Content */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor={`title-${item.id}`}>Page Title</Label>
-                <Input
-                  id={`title-${item.id}`}
-                  value={item.title}
-                  onChange={(e) => updateContent(item.id, 'title', e.target.value)}
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor={`desc-${item.id}`}>Page Description</Label>
-                <Input
-                  id={`desc-${item.id}`}
-                  value={item.description}
-                  onChange={(e) => updateContent(item.id, 'description', e.target.value)}
-                />
-              </div>
-            </div>
-            
-            {/* Video Content */}
-            <div className="border-t pt-4">
-              <div className="flex items-center mb-4">
-                <Video className="h-5 w-5 mr-2 text-blue-600" />
-                <h4 className="font-semibold">Video Content</h4>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <Label htmlFor={`video-id-${item.id}`}>YouTube Video ID</Label>
-                  <Input
-                    id={`video-id-${item.id}`}
-                    value={item.video_id}
-                    onChange={(e) => updateContent(item.id, 'video_id', e.target.value)}
-                    placeholder="e.g., QH2-TGUlwu4"
-                  />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        {Object.keys(defaultContent).map((pageId) => (
+          <Button
+            key={pageId}
+            variant={selectedPage === pageId ? "default" : "outline"}
+            size="sm"
+            onClick={() => setSelectedPage(pageId)}
+            className="capitalize"
+          >
+            {pageId === "homepage" ? "Home" : pageId}
+          </Button>
+        ))}
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="capitalize">
+            Edit {selectedPage === "homepage" ? "Home" : selectedPage} Page Content
+          </CardTitle>
+          <CardDescription>
+            Update the video, title, and description for the {selectedPage === "homepage" ? "homepage" : selectedPage} page
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="title">Page Title</Label>
+            <Input
+              id="title"
+              value={currentPage?.title || ""}
+              onChange={(e) => handleUpdateContent(selectedPage, "title", e.target.value)}
+              placeholder="Enter page title"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Page Description</Label>
+            <Textarea
+              id="description"
+              value={currentPage?.description || ""}
+              onChange={(e) => handleUpdateContent(selectedPage, "description", e.target.value)}
+              placeholder="Enter page description"
+              rows={3}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="videoUrl">Video URL (YouTube Embed)</Label>
+            <Input
+              id="videoUrl"
+              value={currentPage?.videoUrl || ""}
+              onChange={(e) => handleUpdateContent(selectedPage, "videoUrl", e.target.value)}
+              placeholder="https://www.youtube.com/embed/VIDEO_ID"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="videoTitle">Video Title</Label>
+            <Input
+              id="videoTitle"
+              value={currentPage?.videoTitle || ""}
+              onChange={(e) => handleUpdateContent(selectedPage, "videoTitle", e.target.value)}
+              placeholder="Enter video title"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="videoDescription">Video Description</Label>
+            <Textarea
+              id="videoDescription"
+              value={currentPage?.videoDescription || ""}
+              onChange={(e) => handleUpdateContent(selectedPage, "videoDescription", e.target.value)}
+              placeholder="Enter video description"
+              rows={3}
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <Button 
+              onClick={() => handleSaveContent(selectedPage)}
+              disabled={loading}
+              className="bg-[#6cae75] hover:bg-[#5a9d64]"
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
+            <Button 
+              variant="outline" 
+              onClick={() => setPages(Object.values(defaultContent))}
+            >
+              Reset to Default
+            </Button>
+          </div>
+
+          {/* Preview Section */}
+          <div className="border-t pt-6">
+            <h4 className="font-semibold mb-4">Preview</h4>
+            <Card className="bg-gray-50">
+              <CardContent className="p-4">
+                <h3 className="text-lg font-bold mb-2">{currentPage?.title}</h3>
+                <p className="text-sm text-gray-600 mb-4">{currentPage?.description}</p>
+                <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                  <span className="text-gray-500">Video Preview</span>
                 </div>
-                
-                <div>
-                  <Label htmlFor={`video-title-${item.id}`}>Video Title</Label>
-                  <Input
-                    id={`video-title-${item.id}`}
-                    value={item.video_title}
-                    onChange={(e) => updateContent(item.id, 'video_title', e.target.value)}
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor={`video-desc-${item.id}`}>Video Description</Label>
-                <Textarea
-                  id={`video-desc-${item.id}`}
-                  value={item.video_description}
-                  onChange={(e) => updateContent(item.id, 'video_description', e.target.value)}
-                  rows={3}
-                />
-              </div>
-            </div>
-            
-            {/* Demo Content */}
-            <div className="border-t pt-4">
-              <div className="flex items-center mb-4">
-                <FileText className="h-5 w-5 mr-2 text-green-600" />
-                <h4 className="font-semibold">Demo Section</h4>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                <div>
-                  <Label htmlFor={`demo-title-${item.id}`}>Demo Title</Label>
-                  <Input
-                    id={`demo-title-${item.id}`}
-                    value={item.demo_title}
-                    onChange={(e) => updateContent(item.id, 'demo_title', e.target.value)}
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <Label htmlFor={`demo-desc-${item.id}`}>Demo Description</Label>
-                <Textarea
-                  id={`demo-desc-${item.id}`}
-                  value={item.demo_description}
-                  onChange={(e) => updateContent(item.id, 'demo_description', e.target.value)}
-                  rows={2}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+                <h4 className="font-semibold text-sm">{currentPage?.videoTitle}</h4>
+                <p className="text-xs text-gray-600">{currentPage?.videoDescription}</p>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
+
+export default AdminContentManager;
