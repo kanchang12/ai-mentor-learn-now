@@ -39,21 +39,21 @@ const defaultContent: Record<string, PageContent> = {
   general: {
     title: "Perplexity AI Chat Assistant",
     description: "Master Perplexity AI for real-time research and intelligent conversations with web-connected AI",
-    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoUrl: "https://www.youtube.com/embed/fq4k2xawhJQ?si=XmPIDNGqcVcGa3WS",
     videoTitle: "Perplexity AI Complete Tutorial - Research Like a Pro",
     videoDescription: "Learn how to use Perplexity AI for advanced research, fact-checking, and getting up-to-date information with citations"
   },
   writing: {
     title: "Jasper AI Writing Assistant", 
     description: "Create professional content with Jasper AI and advanced writing tools for blogs, emails, and marketing copy",
-    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoUrl: "https://www.youtube.com/embed/fq4k2xawhJQ?si=XmPIDNGqcVcGa3WS",
     videoTitle: "Jasper AI Writing Mastery - From Beginner to Pro",
     videoDescription: "Master content creation using Jasper AI's powerful writing assistant and advanced prompting techniques"
   },
   images: {
     title: "Leonardo AI Image Generator",
     description: "Generate stunning visuals with Leonardo AI's professional image generation and editing tools",
-    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd", 
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4?si=rYqQCFIYLPOeS4hs",
     videoTitle: "Leonardo AI Image Generation Masterclass",
     videoDescription: "Learn to create professional images using Leonardo AI's advanced models and prompting strategies"
   },
@@ -67,7 +67,7 @@ const defaultContent: Record<string, PageContent> = {
   data: {
     title: "AI Data Analysis with Jupyter",
     description: "Analyze data and extract insights using Jupyter AI and advanced analytics tools", 
-    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4?si=ePAK5_lNfBAFg5cG",
     videoTitle: "Data Science with AI - Complete Tutorial",
     videoDescription: "Transform your data into actionable insights using Jupyter AI and advanced analysis techniques"
   },
