@@ -22,9 +22,11 @@ interface CategoryPageLayoutProps {
     buttonUrl: string;
     service: string;
   }>;
+  // Allow additional props that pages might pass
+  [key: string]: any;
 }
 
-export const CategoryPageLayout = ({ category, children, affiliateCards }: CategoryPageLayoutProps) => {
+export const CategoryPageLayout = ({ category, children, affiliateCards, ...props }: CategoryPageLayoutProps) => {
   const { getPageContent } = useContent();
   const { 
     usageMinutes, 
