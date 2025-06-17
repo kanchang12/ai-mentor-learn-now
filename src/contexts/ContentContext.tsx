@@ -24,7 +24,7 @@ const defaultContent: Record<string, PageContent> = {
     id: "homepage",
     title: "Master AI Tutorials, AI Writing & AI Image Editing",
     description: "Learn the most powerful AI tools through step-by-step tutorials. Master ChatGPT, Midjourney, Jasper AI, and more with hands-on practice and expert guidance.",
-    videoUrl: "https://www.youtube.com/embed/QH2-TGUlwu4",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     videoTitle: "Complete AI Mastery Course - 2024 Edition",
     videoDescription: "Everything you need to know about AI tutorials, AI writing tools, and AI image editing in one comprehensive guide. Perfect for beginners and advanced users."
   },
@@ -32,7 +32,7 @@ const defaultContent: Record<string, PageContent> = {
     id: "general",
     title: "AI Tutorials - Master ChatGPT and AI Chat Tools",
     description: "Learn how to use ChatGPT and other AI chat tools effectively with step-by-step tutorials and practical examples.",
-    videoUrl: "https://www.youtube.com/embed/JTxsNm9IdYU",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     videoTitle: "Complete ChatGPT Tutorial - From Beginner to Expert",
     videoDescription: "Master ChatGPT with this comprehensive tutorial covering prompt engineering, advanced techniques, and real-world applications."
   },
@@ -40,7 +40,7 @@ const defaultContent: Record<string, PageContent> = {
     id: "writing",
     title: "AI Writing Tools - Master Jasper AI and Content Creation",
     description: "Learn to create professional content using AI writing assistants like Jasper AI, Copy.ai, and more.",
-    videoUrl: "https://www.youtube.com/embed/VjVyUh_pKnY",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     videoTitle: "AI Writing Mastery - Complete Guide to AI Content Creation",
     videoDescription: "Learn how to create engaging content, blog posts, and marketing copy using advanced AI writing tools and techniques."
   },
@@ -48,7 +48,7 @@ const defaultContent: Record<string, PageContent> = {
     id: "images",
     title: "AI Image Editing - Master Midjourney and DALL-E",
     description: "Create stunning visuals with AI image generation and editing tools including Midjourney, DALL-E, and Stable Diffusion.",
-    videoUrl: "https://www.youtube.com/embed/35RaoKs1hJU",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     videoTitle: "AI Image Generation Masterclass - Midjourney & DALL-E Guide",
     videoDescription: "Complete guide to AI image generation covering Midjourney, DALL-E, prompt engineering, and advanced techniques for creating professional visuals."
   },
@@ -56,7 +56,7 @@ const defaultContent: Record<string, PageContent> = {
     id: "business",
     title: "Business AI Automation - Streamline Your Workflow",
     description: "Automate your business processes with AI tools and increase productivity with intelligent automation solutions.",
-    videoUrl: "https://www.youtube.com/embed/d4yCWBzIhqs",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     videoTitle: "Business AI Automation Complete Guide",
     videoDescription: "Learn how to implement AI automation in your business, streamline workflows, and boost productivity with the latest AI tools."
   },
@@ -64,7 +64,7 @@ const defaultContent: Record<string, PageContent> = {
     id: "data",
     title: "AI Data Analysis - Extract Insights with Artificial Intelligence",
     description: "Learn to analyze data and extract valuable insights using AI-powered analytics tools and machine learning techniques.",
-    videoUrl: "https://www.youtube.com/embed/aircAruvnKk",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     videoTitle: "AI Data Analysis Mastery Course",
     videoDescription: "Master data analysis with AI tools, learn machine learning basics, and discover how to extract actionable insights from your data."
   },
@@ -72,7 +72,7 @@ const defaultContent: Record<string, PageContent> = {
     id: "website",
     title: "AI Website Builder - Create Professional Sites with AI",
     description: "Build professional websites using AI-powered tools and platforms that automate design and development processes.",
-    videoUrl: "https://www.youtube.com/embed/gUmBf2HfUUY",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
     videoTitle: "AI Website Building Complete Tutorial",
     videoDescription: "Learn to build professional websites using AI tools, from design to deployment, with practical examples and best practices."
   }
