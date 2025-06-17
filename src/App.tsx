@@ -13,7 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import General from "./pages/General";
 import Writing from "./pages/Writing";
 import Images from "./pages/Images";
-import Business from "./pages/Business";
+import Book from "./pages/Book";
 import Data from "./pages/Data";
 import Website from "./pages/Website";
 import Admin from "./pages/Admin";
@@ -57,9 +57,9 @@ const App = () => (
                   <Images />
                 </ProtectedRoute>
               } />
-              <Route path="/business" element={
+              <Route path="/book" element={
                 <ProtectedRoute>
-                  <Business />
+                  <Book />
                 </ProtectedRoute>
               } />
               <Route path="/data" element={

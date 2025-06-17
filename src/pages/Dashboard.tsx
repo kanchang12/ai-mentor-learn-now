@@ -5,7 +5,7 @@ import {
   MessageSquare, 
   Image, 
   PenTool, 
-  Briefcase, 
+  BookOpen, 
   BarChart3, 
   Globe,
   ArrowRight,
@@ -60,14 +60,14 @@ const Dashboard = () => {
       href: "/images"
     },
     {
-      id: "business",
-      title: "Business Automation",
-      description: "Automate workflows and streamline business processes",
-      icon: Briefcase,
+      id: "book",
+      title: "Write a Book",
+      description: "Write complete books with AI-powered assistance",
+      icon: BookOpen,
       color: "from-orange-500/20 to-red-500/20",
       borderColor: "border-orange-500/30",
       iconColor: "text-orange-600",
-      href: "/business"
+      href: "/book"
     },
     {
       id: "data",

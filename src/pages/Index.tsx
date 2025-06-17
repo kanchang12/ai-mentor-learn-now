@@ -4,7 +4,7 @@ import {
   MessageSquare, 
   Image, 
   PenTool, 
-  Briefcase, 
+  BookOpen, 
   BarChart3, 
   Globe,
   ArrowRight
@@ -49,14 +49,14 @@ const Index = () => {
       href: "/images"
     },
     {
-      id: "business",
-      title: "Make.com Automation",
-      description: "Automate workflows with Make.com's visual automation platform",
-      icon: Briefcase,
+      id: "book",
+      title: "SudoWriter Book",
+      description: "Write complete books with SudoWriter's AI-powered writing assistant",
+      icon: BookOpen,
       color: "from-orange-500/20 to-red-500/20",
       borderColor: "border-orange-500/30",
       iconColor: "text-orange-600",
-      href: "/business"
+      href: "/book"
     },
     {
       id: "data",
