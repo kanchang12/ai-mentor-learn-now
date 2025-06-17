@@ -74,6 +74,10 @@ Your book would be generated with AI assistance while maintaining your unique vo
     URL.revokeObjectURL(url);
   };
 
+  const handleAffiliateClick = (service: string) => {
+    console.log(`Affiliate click tracked for: ${service}`);
+  };
+
   const demoContent = (
     <div className="space-y-4">
       <Select value={bookType} onValueChange={setBookType}>
@@ -160,8 +164,8 @@ Your book would be generated with AI assistance while maintaining your unique vo
             "Multiple genre support"
           ]}
           ctaText="Start Writing Your Book"
-          ctaUrl="https://sudowriter.com"
-          isExternal={true}
+          affiliateUrl="https://sudowriter.com"
+          onAffiliateClick={handleAffiliateClick}
         />
       </CategoryPageLayout>
       <VoiceAgent pageContext="book" />
