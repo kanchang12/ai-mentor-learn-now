@@ -34,7 +34,9 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
     document.head.appendChild(script);
 
     return () => {
-      document.head.removeChild(script);
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
     };
   }, []);
 
@@ -42,8 +44,8 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
     if (!window.Vapi) return;
 
     try {
-      // Initialize with admin-provided credentials (will be set via admin panel)
-      const apiKey = "admin_will_set_this"; // This will be replaced by admin
+      // Get API key from localStorage (set by admin)
+      const apiKey = localStorage.getItem('vapi_api_key') || 'demo_key';
       const client = new window.Vapi(apiKey);
       setVapiClient(client);
 
@@ -93,7 +95,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
         console.error('VAPI error:', error);
         toast({
           title: "Voice Assistant Error",
-          description: "Failed to connect to voice assistant. Please try again.",
+          description: "API key not configured or invalid. Admin needs to set VAPI credentials.",
           variant: "destructive",
         });
       });
@@ -106,17 +108,18 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
   const startCall = async () => {
     if (!vapiClient) {
       toast({
-        title: "Not ready",
-        description: "VAPI client is still initializing...",
+        title: "VAPI Not Ready",
+        description: "Voice service is initializing or API key not configured...",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      // Start VAPI call with context
+      const assistantId = localStorage.getItem('vapi_assistant_id') || 'demo_assistant';
+      
       await vapiClient.start({
-        assistantId: "admin_will_set_this", // This will be replaced by admin
+        assistantId: assistantId,
         assistantOverrides: {
           firstMessage: getContextualGreeting(),
           variableValues: {
@@ -128,7 +131,7 @@ export const VoiceAgent = ({ pageContext = "general" }: VoiceAgentProps) => {
       console.error("Failed to start VAPI call:", error);
       toast({
         title: "Failed to start call",
-        description: "Could not connect to voice assistant.",
+        description: "Could not connect to voice assistant. Check API configuration.",
         variant: "destructive",
       });
     }

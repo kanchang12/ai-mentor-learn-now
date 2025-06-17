@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, ReactNode, useState } from 'react';
 
 interface PageContent {
@@ -30,24 +31,24 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 const defaultContent: Record<string, PageContent> = {
   general: {
     title: "General AI Assistant",
-    description: "Chat with AI and get instant answers",
+    description: "Master ChatGPT, Claude, and Perplexity for everyday AI tasks",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    videoTitle: "Getting Started with AI Chat",
-    videoDescription: "Learn how to effectively communicate with AI assistants"
+    videoTitle: "Getting Started with AI Chat - Complete Guide",
+    videoDescription: "Learn how to effectively use Perplexity, ChatGPT and Claude for maximum productivity"
   },
   writing: {
     title: "AI Writing Assistant", 
-    description: "Create professional content with AI",
+    description: "Create professional content with Perplexity AI and advanced writing tools",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    videoTitle: "AI Writing Mastery",
-    videoDescription: "Learn to create compelling content with AI tools"
+    videoTitle: "AI Writing Mastery with Perplexity",
+    videoDescription: "Master content creation using AI writing tools and advanced prompting techniques"
   },
   images: {
     title: "AI Image Generator",
-    description: "Generate and edit images with AI",
+    description: "Generate stunning visuals with Leonardo AI and advanced image models",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", 
-    videoTitle: "AI Image Generation Guide",
-    videoDescription: "Master the art of AI image creation"
+    videoTitle: "Leonardo AI Image Generation Masterclass",
+    videoDescription: "Learn to create professional images using Leonardo AI and advanced prompting"
   },
   music: {
     title: "AI Music Generator",
@@ -58,10 +59,10 @@ const defaultContent: Record<string, PageContent> = {
   },
   data: {
     title: "AI Data Analysis",
-    description: "Analyze data and extract insights with AI", 
+    description: "Analyze data and extract insights with Claude AI and advanced analytics", 
     videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
-    videoTitle: "Data Analysis with AI",
-    videoDescription: "Transform your data into actionable insights"
+    videoTitle: "Data Science with AI - Complete Tutorial",
+    videoDescription: "Transform your data into actionable insights using Claude AI and advanced analysis techniques"
   },
   website: {
     title: "AI Website Builder",

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -44,6 +45,49 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
 
   const content = getPageContent(category);
 
+  // Function to call the appropriate AI service based on category
+  const callAIService = async (prompt: string) => {
+    try {
+      let endpoint = '';
+      
+      switch (category) {
+        case 'general':
+          endpoint = '/functions/v1/perplexity-chat';
+          break;
+        case 'writing':
+          endpoint = '/functions/v1/perplexity-writing';
+          break;
+        case 'images':
+          endpoint = '/functions/v1/leonardo-generate';
+          break;
+        case 'data':
+          endpoint = '/functions/v1/claude-analyze';
+          break;
+        default:
+          endpoint = '/functions/v1/perplexity-chat';
+      }
+
+      const response = await fetch(`https://jwfhvjlckeenfxqumaea.supabase.co${endpoint}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3Zmh2amxja2VlbmZ4cXVtYWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxMDk5NjIsImV4cCI6MjA2NTY4NTk2Mn0.QNtEY74wscU8RfAS2ylXXC_9GLKEUAbxH9IPC5N9zXw`
+        },
+        body: JSON.stringify({ prompt })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.response || data.result || data.generatedText || 'AI response received';
+    } catch (error) {
+      console.error('AI service error:', error);
+      return `AI service for ${category} is currently being set up. This is a demo response showing how it would work when properly configured with API keys.`;
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -61,9 +105,8 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
     setIsLoading(true);
 
     try {
-      // Simulate AI response processing
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setResponse(`AI Response for ${category}: ${input}`);
+      const aiResponse = await callAIService(input);
+      setResponse(aiResponse);
       
       // Track usage time (simulate 1 minute per request for demo)
       const usedMinutes = 1;
@@ -78,6 +121,13 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
     }
   };
 
@@ -130,7 +180,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
             </Card>
 
             {/* Voice Agent */}
-            <VoiceAgent />
+            <VoiceAgent pageContext={category} />
           </div>
 
           {/* AI Chat Section */}
@@ -138,7 +188,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
             <Card className="bg-white border border-gray-200 rounded-[20px]">
               <CardHeader>
                 <CardTitle className="text-[#22201d]">AI Assistant</CardTitle>
-                <CardDescription>Ask questions and get instant help</CardDescription>
+                <CardDescription>Ask questions and get instant help with {category}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -146,6 +196,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
                     placeholder={`Ask me anything about ${category}...`}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
+                    onKeyPress={handleKeyPress}
                     className="min-h-[100px] resize-none border-gray-200 focus:border-[#6cae75] focus:ring-[#6cae75]"
                     disabled={!hasUnlimitedAccess && isLimitReached}
                   />
@@ -181,7 +232,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
 
                 {response && (
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <p className="text-[#22201d] text-sm">{response}</p>
+                    <p className="text-[#22201d] text-sm whitespace-pre-wrap">{response}</p>
                   </div>
                 )}
               </CardContent>

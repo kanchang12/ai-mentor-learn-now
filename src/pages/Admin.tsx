@@ -53,17 +53,20 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
   const [apiKeys, setApiKeys] = useState({
     perplexity: '',
-    jasper: '',
     leonardo: '',
     claude: '',
-    wix: '',
-    makecom: ''
+    vapi_api_key: '',
+    vapi_assistant_id: '',
+    openai: '',
+    anthropic: '',
+    huggingface: ''
   });
-  const [activeTab, setActiveTab] = useState("content");
+  const [activeTab, setActiveTab] = useState("api-keys");
   const { toast } = useToast();
 
   useEffect(() => {
     fetchAdminData();
+    loadApiKeys();
   }, []);
 
   const fetchAdminData = async () => {
@@ -161,6 +164,20 @@ const Admin = () => {
     }
   };
 
+  const loadApiKeys = () => {
+    const keys = {
+      perplexity: localStorage.getItem('api_key_perplexity') || '',
+      leonardo: localStorage.getItem('api_key_leonardo') || '',
+      claude: localStorage.getItem('api_key_claude') || '',
+      vapi_api_key: localStorage.getItem('vapi_api_key') || '',
+      vapi_assistant_id: localStorage.getItem('vapi_assistant_id') || '',
+      openai: localStorage.getItem('api_key_openai') || '',
+      anthropic: localStorage.getItem('api_key_anthropic') || '',
+      huggingface: localStorage.getItem('api_key_huggingface') || ''
+    };
+    setApiKeys(keys);
+  };
+
   const promoteToAdmin = async (userId: string) => {
     try {
       console.log('Promoting user to admin:', userId);
@@ -232,8 +249,14 @@ const Admin = () => {
     }
 
     try {
-      // Store the API key in localStorage for now (in production, this would be in Supabase secrets)
-      localStorage.setItem(`api_key_${service.toLowerCase()}`, key);
+      localStorage.setItem(service === 'VAPI API Key' ? 'vapi_api_key' : 
+                          service === 'VAPI Assistant ID' ? 'vapi_assistant_id' :
+                          `api_key_${service.toLowerCase()}`, key);
+      
+      const keyName = service === 'VAPI API Key' ? 'vapi_api_key' : 
+                     service === 'VAPI Assistant ID' ? 'vapi_assistant_id' :
+                     service.toLowerCase();
+      setApiKeys(prev => ({ ...prev, [keyName]: key }));
       
       toast({
         title: "Success",
@@ -280,7 +303,7 @@ const Admin = () => {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-[#22201d]">Admin Dashboard</h1>
-                  <p className="text-sm text-[#22201d] opacity-70">System management & analytics</p>
+                  <p className="text-sm text-[#22201d] opacity-70">System management & API keys</p>
                 </div>
               </div>
             </div>
@@ -293,23 +316,23 @@ const Admin = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <Card 
             className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleQuickAction('api-keys')}
+          >
+            <CardContent className="p-4 text-center">
+              <Key className="h-8 w-8 text-green-600 mx-auto mb-2" />
+              <h3 className="font-semibold text-[#22201d]">API Keys</h3>
+              <p className="text-sm text-[#22201d] opacity-70">Configure all services</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow"
             onClick={() => handleQuickAction('content')}
           >
             <CardContent className="p-4 text-center">
               <Video className="h-8 w-8 text-blue-600 mx-auto mb-2" />
               <h3 className="font-semibold text-[#22201d]">Edit Content</h3>
               <p className="text-sm text-[#22201d] opacity-70">Manage all page content</p>
-            </CardContent>
-          </Card>
-
-          <Card 
-            className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => handleQuickAction('api-keys')}
-          >
-            <CardContent className="p-4 text-center">
-              <Key className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <h3 className="font-semibold text-[#22201d]">API Keys</h3>
-              <p className="text-sm text-[#22201d] opacity-70">Manage all API keys</p>
             </CardContent>
           </Card>
 
@@ -392,43 +415,32 @@ const Admin = () => {
         {/* Main Content */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
-            <TabsTrigger value="content">Content Management</TabsTrigger>
             <TabsTrigger value="api-keys">API Keys</TabsTrigger>
+            <TabsTrigger value="content">Content Management</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
-
-          <TabsContent value="content">
-            <Card>
-              <CardHeader>
-                <CardTitle>Content & Video Management</CardTitle>
-                <CardDescription>Edit all page content, videos, and descriptions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <AdminContentManager />
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           <TabsContent value="api-keys">
             <Card>
               <CardHeader>
                 <CardTitle>API Keys Management</CardTitle>
-                <CardDescription>Manage API keys for all AI services</CardDescription>
+                <CardDescription>Configure all AI service API keys to enable functionality</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 className="font-semibold text-blue-900 mb-2">API Keys Setup</h3>
+                    <h3 className="font-semibold text-blue-900 mb-2">Important: Set All API Keys</h3>
                     <p className="text-sm text-blue-800">
-                      Configure API keys for each service. These will be used across all pages automatically.
+                      Configure these API keys to enable all AI functionality. Without proper keys, services will show demo responses.
                     </p>
                   </div>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Perplexity AI */}
                     <Card>
                       <CardContent className="p-6">
-                        <h4 className="font-medium mb-4">Perplexity AI (General Chat)</h4>
+                        <h4 className="font-medium mb-4">Perplexity AI (General Chat & Writing)</h4>
                         <div className="space-y-3">
                           <Input
                             type="password"
@@ -447,6 +459,7 @@ const Admin = () => {
                       </CardContent>
                     </Card>
                     
+                    {/* Leonardo AI */}
                     <Card>
                       <CardContent className="p-6">
                         <h4 className="font-medium mb-4">Leonardo AI (Images)</h4>
@@ -468,6 +481,7 @@ const Admin = () => {
                       </CardContent>
                     </Card>
 
+                    {/* Claude AI */}
                     <Card>
                       <CardContent className="p-6">
                         <h4 className="font-medium mb-4">Claude AI (Data Analysis)</h4>
@@ -489,70 +503,98 @@ const Admin = () => {
                       </CardContent>
                     </Card>
 
+                    {/* VAPI Configuration */}
                     <Card>
                       <CardContent className="p-6">
-                        <h4 className="font-medium mb-4">Jasper AI (Writing)</h4>
+                        <h4 className="font-medium mb-4">VAPI Voice Assistant</h4>
                         <div className="space-y-3">
                           <Input
                             type="password"
-                            placeholder="Enter Jasper API key..."
-                            value={apiKeys.jasper}
-                            onChange={(e) => setApiKeys(prev => ({ ...prev, jasper: e.target.value }))}
+                            placeholder="Enter VAPI API key..."
+                            value={apiKeys.vapi_api_key}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, vapi_api_key: e.target.value }))}
+                          />
+                          <Input
+                            type="text"
+                            placeholder="Enter VAPI Assistant ID..."
+                            value={apiKeys.vapi_assistant_id}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, vapi_assistant_id: e.target.value }))}
                           />
                           <Button 
                             size="sm" 
-                            onClick={() => updateApiKey('Jasper', apiKeys.jasper)}
+                            onClick={() => updateApiKey('VAPI API Key', apiKeys.vapi_api_key)}
                             className="w-full"
                           >
-                            Update Jasper Key
+                            Update VAPI API Key
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            onClick={() => updateApiKey('VAPI Assistant ID', apiKeys.vapi_assistant_id)}
+                            className="w-full"
+                          >
+                            Update VAPI Assistant ID
                           </Button>
                         </div>
                       </CardContent>
                     </Card>
 
+                    {/* OpenAI */}
                     <Card>
                       <CardContent className="p-6">
-                        <h4 className="font-medium mb-4">Make.com (Business Automation)</h4>
+                        <h4 className="font-medium mb-4">OpenAI (Backup/Alternative)</h4>
                         <div className="space-y-3">
                           <Input
                             type="password"
-                            placeholder="Enter Make.com webhook URL..."
-                            value={apiKeys.makecom}
-                            onChange={(e) => setApiKeys(prev => ({ ...prev, makecom: e.target.value }))}
+                            placeholder="Enter OpenAI API key..."
+                            value={apiKeys.openai}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
                           />
                           <Button 
                             size="sm" 
-                            onClick={() => updateApiKey('MakeCom', apiKeys.makecom)}
+                            onClick={() => updateApiKey('OpenAI', apiKeys.openai)}
                             className="w-full"
                           >
-                            Update Make.com URL
+                            Update OpenAI Key
                           </Button>
                         </div>
                       </CardContent>
                     </Card>
 
+                    {/* Hugging Face */}
                     <Card>
                       <CardContent className="p-6">
-                        <h4 className="font-medium mb-4">Wix (Website Building)</h4>
+                        <h4 className="font-medium mb-4">Hugging Face (Alternative Images)</h4>
                         <div className="space-y-3">
                           <Input
                             type="password"
-                            placeholder="Enter Wix API key (optional)..."
-                            value={apiKeys.wix}
-                            onChange={(e) => setApiKeys(prev => ({ ...prev, wix: e.target.value }))}
+                            placeholder="Enter Hugging Face API token..."
+                            value={apiKeys.huggingface}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, huggingface: e.target.value }))}
                           />
                           <Button 
                             size="sm" 
-                            onClick={() => updateApiKey('Wix', apiKeys.wix)}
+                            onClick={() => updateApiKey('HuggingFace', apiKeys.huggingface)}
                             className="w-full"
                           >
-                            Update Wix Key
+                            Update HuggingFace Token
                           </Button>
                         </div>
                       </CardContent>
                     </Card>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="content">
+            <Card>
+              <CardHeader>
+                <CardTitle>Content & Video Management</CardTitle>
+                <CardDescription>Edit all page content, videos, and descriptions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <AdminContentManager />
               </CardContent>
             </Card>
           </TabsContent>
