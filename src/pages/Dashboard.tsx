@@ -16,6 +16,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAdminCheck } from "@/hooks/useAdminCheck";
+import { VoiceAgent } from "@/components/VoiceAgent";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -192,6 +193,9 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Voice Agent */}
+      <VoiceAgent pageContext="dashboard" />
     </div>
   );
 };

@@ -1,92 +1,78 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Briefcase } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Briefcase, Zap } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
-import { AffiliateCard } from "@/components/AffiliateCard";
-import { useUsageTracking } from "@/hooks/useUsageTracking";
 import { useToast } from "@/hooks/use-toast";
 
 const Business = () => {
-  const [automationData, setAutomationData] = useState("");
-  const [isTriggering, setIsTriggering] = useState(false);
-  const [response, setResponse] = useState("");
-  const { trackAffiliateClick } = useUsageTracking('business');
+  const [workflowType, setWorkflowType] = useState("");
+  const [description, setDescription] = useState("");
+  const [isCreating, setIsCreating] = useState(false);
+  const [result, setResult] = useState("");
   const { toast } = useToast();
 
-  const triggerAutomation = async () => {
-    const webhookUrl = localStorage.getItem('api_key_makecom');
-    if (!webhookUrl) {
+  const createWorkflow = async () => {
+    if (!workflowType || !description.trim()) {
       toast({
         title: "Error",
-        description: "Make.com webhook URL not configured. Please contact admin.",
+        description: "Please select workflow type and enter description",
         variant: "destructive",
       });
       return;
     }
     
-    setIsTriggering(true);
-    setResponse("");
+    setIsCreating(true);
+    setResult("");
     
-    try {
-      const requestData = {
-        timestamp: new Date().toISOString(),
-        data: automationData || "Automation triggered from HowToUseAI.uk",
-        source: "howtouseai-business-automation"
+    setTimeout(() => {
+      const workflows = {
+        email: `Email Automation Workflow Created!\n\n✅ Trigger: New contact form submission\n✅ Action 1: Send welcome email\n✅ Action 2: Add to CRM\n✅ Action 3: Notify sales team\n\nThis would integrate with your email platform and CRM.`,
+        social: `Social Media Automation Workflow Created!\n\n✅ Trigger: New blog post published\n✅ Action 1: Create social media posts\n✅ Action 2: Schedule across platforms\n✅ Action 3: Track engagement\n\nThis would connect to your social media accounts.`,
+        data: `Data Processing Workflow Created!\n\n✅ Trigger: New data file uploaded\n✅ Action 1: Clean and format data\n✅ Action 2: Generate insights\n✅ Action 3: Send report to team\n\nThis would process your data automatically.`
       };
-
-      await fetch(webhookUrl, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        mode: "no-cors",
-        body: JSON.stringify(requestData),
-      });
-
-      setResponse("Automation triggered successfully! Check your Make.com scenario for execution details.");
-      toast({
-        title: "Success",
-        description: "Make.com automation has been triggered",
-      });
-    } catch (error) {
-      console.error('Error triggering Make.com automation:', error);
-      setResponse("Error triggering automation. Please check configuration.");
-      toast({
-        title: "Error",
-        description: "Failed to trigger automation",
-        variant: "destructive",
-      });
-    } finally {
-      setIsTriggering(false);
-    }
+      
+      setResult(workflows[workflowType as keyof typeof workflows] || "Custom workflow created successfully!");
+      setIsCreating(false);
+    }, 2000);
   };
 
   const demoContent = (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Automation Data (Optional)</label>
-        <Textarea
-          placeholder="Enter any data to send with the automation trigger..."
-          value={automationData}
-          onChange={(e) => setAutomationData(e.target.value)}
-          className="min-h-[80px] text-[#22201d]"
-        />
-      </div>
+      <Select value={workflowType} onValueChange={setWorkflowType}>
+        <SelectTrigger>
+          <SelectValue placeholder="What type of workflow?" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="email">Email Automation</SelectItem>
+          <SelectItem value="social">Social Media</SelectItem>
+          <SelectItem value="data">Data Processing</SelectItem>
+          <SelectItem value="crm">CRM Integration</SelectItem>
+        </SelectContent>
+      </Select>
+      
+      <Textarea
+        placeholder="Describe what you want to automate..."
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        className="min-h-[100px] text-[#22201d]"
+      />
       
       <Button 
-        onClick={triggerAutomation}
-        disabled={isTriggering}
-        className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
+        onClick={createWorkflow}
+        disabled={!workflowType || !description.trim() || isCreating}
+        className="bg-[#6cae75] hover:bg-[#5a9d64] text-white w-full"
       >
-        {isTriggering ? "Triggering..." : "Trigger Automation"}
+        {isCreating ? "Creating Workflow..." : "Create Automation"}
       </Button>
       
-      {response && (
+      {result && (
         <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
-          <h4 className="font-medium text-[#22201d] mb-2">Status:</h4>
-          <p className="text-[#22201d] opacity-80">{response}</p>
+          <h4 className="font-medium text-[#22201d] mb-2">Workflow Created:</h4>
+          <pre className="text-[#22201d] opacity-80 whitespace-pre-wrap text-sm">{result}</pre>
         </div>
       )}
     </div>
@@ -96,32 +82,15 @@ const Business = () => {
     <CategoryPageLayout
       category="business"
       title="Business Automation"
-      description="Automate workflows with AI"
+      description="Automate workflows and boost productivity"
       icon={<Briefcase className="h-5 w-5 text-orange-600" />}
-      videoId="5dTK8qZHbhQ"
-      videoTitle="Business Automation with Make.com"
-      videoDescription="Learn to automate your business processes with Make.com"
-      demoTitle="Try Make.com Automation"
-      demoDescription="Trigger your Make.com scenarios directly"
+      videoId="biz123"
+      videoTitle="Business Automation Mastery"
+      videoDescription="Learn to automate your business processes"
+      demoTitle="Try Workflow Automation"
+      demoDescription="Create automated workflows for your business"
       demoContent={demoContent}
-    >
-      <AffiliateCard
-        title="Make.com"
-        description="Visual automation platform to connect apps and automate workflows without coding."
-        features={[
-          "1000+ app integrations",
-          "Visual workflow builder",
-          "Real-time execution",
-          "Advanced data processing"
-        ]}
-        ctaText="Start with Make.com"
-        affiliateUrl="https://www.make.com"
-        commission="Partner program available"
-        rating={4.7}
-        onAffiliateClick={trackAffiliateClick}
-        service="make"
-      />
-    </CategoryPageLayout>
+    />
   );
 };
 

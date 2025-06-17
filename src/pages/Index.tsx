@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useContent } from "@/contexts/ContentContext";
+import { VoiceAgent } from "@/components/VoiceAgent";
 
 const Index = () => {
   const { getPageContent } = useContent();
@@ -223,6 +224,9 @@ const Index = () => {
           </div>
         </div>
       </div>
+
+      {/* Voice Agent */}
+      <VoiceAgent pageContext="homepage" />
     </div>
   );
 };
