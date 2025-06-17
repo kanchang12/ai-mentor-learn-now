@@ -29,11 +29,6 @@ const Dashboard = () => {
     navigate("/");
   };
 
-  const handleCategoryClick = (href: string) => {
-    console.log(`Navigating to: ${href}`);
-    navigate(href);
-  };
-
   const categories = [
     {
       id: "general",
@@ -160,7 +155,7 @@ const Dashboard = () => {
           {categories.map((category) => {
             const IconComponent = category.icon;
             return (
-              <div key={category.id} onClick={() => handleCategoryClick(category.href)} className="cursor-pointer">
+              <Link key={category.id} to={category.href}>
                 <Card className="h-full hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer bg-white border border-gray-200 rounded-[20px]">
                   <CardHeader className="pb-4">
                     <div className={`w-12 h-12 bg-gradient-to-br ${category.color} rounded-xl flex items-center justify-center border ${category.borderColor} mb-4`}>
@@ -177,7 +172,7 @@ const Dashboard = () => {
                     </CardDescription>
                   </CardContent>
                 </Card>
-              </div>
+              </Link>
             );
           })}
         </div>
@@ -186,21 +181,16 @@ const Dashboard = () => {
         <div className="mt-12 text-center">
           <h2 className="text-2xl font-bold text-[#22201d] mb-6">Need Help Getting Started?</h2>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]"
-              onClick={() => handleCategoryClick("/general")}
-            >
-              Start with General AI
-            </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="rounded-[30px]"
-              onClick={() => handleCategoryClick("/billing")}
-            >
-              Upgrade for Unlimited Access
-            </Button>
+            <Link to="/general">
+              <Button size="lg" className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
+                Start with General AI
+              </Button>
+            </Link>
+            <Link to="/billing">
+              <Button size="lg" variant="outline" className="rounded-[30px]">
+                Upgrade for Unlimited Access
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
