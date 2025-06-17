@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, ReactNode, useState } from 'react';
 
 interface PageContent {
@@ -60,7 +59,7 @@ const defaultContent: Record<string, PageContent> = {
   data: {
     title: "AI Data Analysis",
     description: "Analyze data and extract insights with AI", 
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
     videoTitle: "Data Analysis with AI",
     videoDescription: "Transform your data into actionable insights"
   },
