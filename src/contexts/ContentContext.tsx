@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, ReactNode } from 'react';
+import React, { createContext, useContext, ReactNode, useState } from 'react';
 
 interface PageContent {
   title: string;
@@ -7,10 +7,23 @@ interface PageContent {
   videoUrl: string;
   videoTitle: string;
   videoDescription: string;
+  heroImage?: string;
+  backgroundImage?: string;
+  logoUrl?: string;
+  ctaButtonText?: string;
+  ctaButtonUrl?: string;
+  socialLinks?: {
+    twitter?: string;
+    youtube?: string;
+    linkedin?: string;
+    facebook?: string;
+  };
 }
 
 interface ContentContextType {
   getPageContent: (category: string) => PageContent;
+  updatePageContent: (category: string, updates: Partial<PageContent>) => void;
+  setAllContent: (content: Record<string, PageContent>) => void;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -61,12 +74,28 @@ const defaultContent: Record<string, PageContent> = {
 };
 
 export const ContentProvider = ({ children }: { children: ReactNode }) => {
+  const [content, setContent] = useState<Record<string, PageContent>>(defaultContent);
+
   const getPageContent = (category: string): PageContent => {
-    return defaultContent[category] || defaultContent.general;
+    return content[category] || content.general;
+  };
+
+  const updatePageContent = (category: string, updates: Partial<PageContent>) => {
+    setContent(prev => ({
+      ...prev,
+      [category]: {
+        ...prev[category],
+        ...updates
+      }
+    }));
+  };
+
+  const setAllContent = (newContent: Record<string, PageContent>) => {
+    setContent(newContent);
   };
 
   return (
-    <ContentContext.Provider value={{ getPageContent }}>
+    <ContentContext.Provider value={{ getPageContent, updatePageContent, setAllContent }}>
       {children}
     </ContentContext.Provider>
   );

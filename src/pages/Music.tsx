@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Music, ExternalLink } from "lucide-react";
+import { Music as MusicIcon, ExternalLink } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { useToast } from "@/hooks/use-toast";
 import { VoiceAgent } from "@/components/VoiceAgent";
@@ -78,7 +78,7 @@ const Music = () => {
         onClick={generateMusicWithMubert}
         className="bg-[#6cae75] hover:bg-[#5a9d64] text-white w-full"
       >
-        <Music className="h-4 w-4 mr-2" />
+        <MusicIcon className="h-4 w-4 mr-2" />
         Generate Music with Mubert
       </Button>
       
@@ -97,7 +97,7 @@ const Music = () => {
         category="music"
         title="AI Music Generation"
         description="Create AI-generated music and soundtracks"
-        icon={<Music className="h-5 w-5 text-orange-600" />}
+        icon={<MusicIcon className="h-5 w-5 text-orange-600" />}
         videoId="music123"
         videoTitle="AI Music Generation with Mubert"
         videoDescription="Learn to create professional music with AI tools"
@@ -105,7 +105,6 @@ const Music = () => {
         demoDescription="Generate custom music tracks with AI"
         demoContent={demoContent}
       >
-        {/* Mubert Affiliate Card */}
         <AffiliateCard
           service="Mubert"
           title="Mubert - AI Music Generation Platform"
