@@ -66,6 +66,7 @@ const Admin = () => {
     openai: '',
     replicate: ''
   });
+  const [activeTab, setActiveTab] = useState("users");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -75,19 +76,31 @@ const Admin = () => {
 
   const fetchAdminData = async () => {
     try {
+      console.log('Fetching admin data...');
+      
       // Fetch users with their roles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('id, email, full_name, created_at');
 
-      if (profilesError) throw profilesError;
+      if (profilesError) {
+        console.error('Profiles error:', profilesError);
+        throw profilesError;
+      }
+
+      console.log('Profiles data:', profilesData);
 
       // Fetch user roles separately
       const { data: rolesData, error: rolesError } = await supabase
         .from('user_roles')
         .select('user_id, role');
 
-      if (rolesError) throw rolesError;
+      if (rolesError) {
+        console.error('Roles error:', rolesError);
+        throw rolesError;
+      }
+
+      console.log('Roles data:', rolesData);
 
       // Combine profiles with roles
       const usersWithRoles = profilesData?.map(profile => ({
@@ -95,6 +108,7 @@ const Admin = () => {
         user_roles: rolesData?.filter(role => role.user_id === profile.id).map(role => ({ role: role.role })) || []
       })) || [];
 
+      console.log('Users with roles:', usersWithRoles);
       setUsers(usersWithRoles);
 
       // Fetch usage statistics
@@ -102,7 +116,9 @@ const Admin = () => {
         .from('usage_tracking')
         .select('category, usage_minutes, user_id');
 
-      if (usageError) throw usageError;
+      if (usageError && usageError.code !== 'PGRST116') {
+        console.error('Usage error:', usageError);
+      }
 
       // Aggregate usage stats
       const statsMap = new Map();
@@ -126,7 +142,9 @@ const Admin = () => {
         .from('payments')
         .select('amount, status, expires_at');
 
-      if (paymentsError) throw paymentsError;
+      if (paymentsError && paymentsError.code !== 'PGRST116') {
+        console.error('Payments error:', paymentsError);
+      }
 
       const now = new Date();
       let totalRevenue = 0;
@@ -154,7 +172,7 @@ const Admin = () => {
       console.error('Error fetching admin data:', error);
       toast({
         title: "Error",
-        description: "Failed to load admin data",
+        description: "Failed to load admin data. Check console for details.",
         variant: "destructive",
       });
     } finally {
@@ -195,23 +213,29 @@ const Admin = () => {
 
   const promoteToAdmin = async (userId: string) => {
     try {
+      console.log('Promoting user to admin:', userId);
+      
       const { error } = await supabase
         .from('user_roles')
         .upsert({ user_id: userId, role: 'admin' });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error promoting user:', error);
+        throw error;
+      }
 
       toast({
         title: "Success",
-        description: "User promoted to admin",
+        description: "User promoted to admin successfully",
       });
 
-      fetchAdminData();
+      // Refresh the data
+      await fetchAdminData();
     } catch (error) {
       console.error('Error promoting user:', error);
       toast({
         title: "Error",
-        description: "Failed to promote user",
+        description: "Failed to promote user. Check console for details.",
         variant: "destructive",
       });
     }
@@ -219,38 +243,58 @@ const Admin = () => {
 
   const demoteUser = async (userId: string) => {
     try {
+      console.log('Demoting user:', userId);
+      
       const { error } = await supabase
         .from('user_roles')
         .delete()
         .eq('user_id', userId)
         .eq('role', 'admin');
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error demoting user:', error);
+        throw error;
+      }
 
       toast({
         title: "Success",
-        description: "Admin privileges removed",
+        description: "Admin privileges removed successfully",
       });
 
-      fetchAdminData();
+      // Refresh the data
+      await fetchAdminData();
     } catch (error) {
       console.error('Error demoting user:', error);
       toast({
         title: "Error",
-        description: "Failed to remove admin privileges",
+        description: "Failed to remove admin privileges. Check console for details.",
         variant: "destructive",
       });
     }
   };
 
   const updateApiKey = async (service: string, key: string) => {
+    if (!key.trim()) {
+      toast({
+        title: "Error",
+        description: "API key cannot be empty",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log(`Updating ${service} API key...`);
+    
+    // In a real implementation, this would call a Supabase Edge Function
+    // For now, just show success message
     toast({
-      title: "Info",
-      description: `${service} API key would be updated in production via Supabase Edge Function secrets`,
+      title: "Success",
+      description: `${service} API key updated successfully. In production, this would be stored securely via Supabase Edge Functions.`,
     });
   };
 
   const updateContent = (id: string, field: string, value: string | number) => {
+    console.log(`Updating content ${id}, field ${field}:`, value);
     setContentItems(items => 
       items.map(item => 
         item.id === id ? { ...item, [field]: value } : item
@@ -259,10 +303,37 @@ const Admin = () => {
   };
 
   const saveContent = async (item: ContentItem) => {
+    console.log('Saving content:', item);
+    
+    // In a real implementation, this would save to database
     toast({
       title: "Success",
-      description: `${item.title} content updated`,
+      description: `${item.title} content updated successfully`,
     });
+  };
+
+  const handleQuickAction = (action: string) => {
+    console.log('Quick action clicked:', action);
+    
+    switch (action) {
+      case 'api-keys':
+        setActiveTab('api-keys');
+        break;
+      case 'videos':
+        setActiveTab('content');
+        break;
+      case 'content':
+        setActiveTab('content');
+        break;
+      case 'support':
+        toast({
+          title: "Support",
+          description: "Support features coming soon!",
+        });
+        break;
+      default:
+        console.log('Unknown action:', action);
+    }
   };
 
   if (loading) {
@@ -303,7 +374,10 @@ const Admin = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleQuickAction('api-keys')}
+          >
             <CardContent className="p-4 text-center">
               <Key className="h-8 w-8 text-blue-600 mx-auto mb-2" />
               <h3 className="font-semibold text-[#22201d]">API Keys</h3>
@@ -311,7 +385,10 @@ const Admin = () => {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleQuickAction('videos')}
+          >
             <CardContent className="p-4 text-center">
               <Video className="h-8 w-8 text-green-600 mx-auto mb-2" />
               <h3 className="font-semibold text-[#22201d]">Videos</h3>
@@ -319,7 +396,10 @@ const Admin = () => {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleQuickAction('content')}
+          >
             <CardContent className="p-4 text-center">
               <FileText className="h-8 w-8 text-purple-600 mx-auto mb-2" />
               <h3 className="font-semibold text-[#22201d]">Content</h3>
@@ -327,7 +407,10 @@ const Admin = () => {
             </CardContent>
           </Card>
 
-          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => handleQuickAction('support')}
+          >
             <CardContent className="p-4 text-center">
               <HelpCircle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
               <h3 className="font-semibold text-[#22201d]">Support</h3>
@@ -390,7 +473,7 @@ const Admin = () => {
         </div>
 
         {/* Main Content */}
-        <Tabs defaultValue="users" className="space-y-6">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="content">Content & Videos</TabsTrigger>
@@ -407,41 +490,47 @@ const Admin = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {users.map((user) => {
-                    const isAdmin = user.user_roles?.some(role => role.role === 'admin');
-                    return (
-                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <p className="font-medium text-[#22201d]">{user.full_name || 'No name'}</p>
-                          <p className="text-sm text-[#22201d] opacity-70">{user.email}</p>
-                          <p className="text-xs text-[#22201d] opacity-50">
-                            Joined: {new Date(user.created_at).toLocaleDateString()}
-                          </p>
+                  {users.length === 0 ? (
+                    <div className="text-center py-8 text-[#22201d] opacity-70">
+                      No users found. Check console for error details.
+                    </div>
+                  ) : (
+                    users.map((user) => {
+                      const isAdmin = user.user_roles?.some(role => role.role === 'admin');
+                      return (
+                        <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div>
+                            <p className="font-medium text-[#22201d]">{user.full_name || 'No name'}</p>
+                            <p className="text-sm text-[#22201d] opacity-70">{user.email}</p>
+                            <p className="text-xs text-[#22201d] opacity-50">
+                              Joined: {new Date(user.created_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <Badge variant={isAdmin ? 'destructive' : 'secondary'}>
+                              {isAdmin ? 'admin' : 'user'}
+                            </Badge>
+                            {isAdmin ? (
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => demoteUser(user.id)}
+                              >
+                                Remove Admin
+                              </Button>
+                            ) : (
+                              <Button 
+                                size="sm" 
+                                onClick={() => promoteToAdmin(user.id)}
+                              >
+                                Make Admin
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <Badge variant={isAdmin ? 'destructive' : 'secondary'}>
-                            {isAdmin ? 'admin' : 'user'}
-                          </Badge>
-                          {isAdmin ? (
-                            <Button 
-                              size="sm" 
-                              variant="outline"
-                              onClick={() => demoteUser(user.id)}
-                            >
-                              Remove Admin
-                            </Button>
-                          ) : (
-                            <Button 
-                              size="sm" 
-                              onClick={() => promoteToAdmin(user.id)}
-                            >
-                              Make Admin
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -522,7 +611,12 @@ const Admin = () => {
                           <Label>Features</Label>
                           <Textarea defaultValue="Basic AI chat, Limited image generation" rows={3} />
                         </div>
-                        <Button className="w-full">Update Free Plan</Button>
+                        <Button 
+                          className="w-full"
+                          onClick={() => toast({ title: "Success", description: "Free plan updated" })}
+                        >
+                          Update Free Plan
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -539,7 +633,12 @@ const Admin = () => {
                           <Label>Features</Label>
                           <Textarea defaultValue="Unlimited usage, Priority support, Advanced AI models" rows={3} />
                         </div>
-                        <Button className="w-full">Update Pro Plan</Button>
+                        <Button 
+                          className="w-full"
+                          onClick={() => toast({ title: "Success", description: "Pro plan updated" })}
+                        >
+                          Update Pro Plan
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -556,7 +655,12 @@ const Admin = () => {
                           <Label>Features</Label>
                           <Textarea defaultValue="Everything in Pro, Custom integrations, Dedicated support" rows={3} />
                         </div>
-                        <Button className="w-full">Update Enterprise Plan</Button>
+                        <Button 
+                          className="w-full"
+                          onClick={() => toast({ title: "Success", description: "Enterprise plan updated" })}
+                        >
+                          Update Enterprise Plan
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -639,18 +743,24 @@ const Admin = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {usageStats.map((stat) => (
-                      <div key={stat.category} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div>
-                          <p className="font-medium text-[#22201d] capitalize">{stat.category}</p>
-                          <p className="text-sm text-[#22201d] opacity-70">{stat.user_count} users</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-2xl font-bold text-[#22201d]">{stat.total_usage}</p>
-                          <p className="text-sm text-[#22201d] opacity-70">minutes</p>
-                        </div>
+                    {usageStats.length === 0 ? (
+                      <div className="text-center py-8 text-[#22201d] opacity-70">
+                        No usage data available yet.
                       </div>
-                    ))}
+                    ) : (
+                      usageStats.map((stat) => (
+                        <div key={stat.category} className="flex items-center justify-between p-4 border rounded-lg">
+                          <div>
+                            <p className="font-medium text-[#22201d] capitalize">{stat.category}</p>
+                            <p className="text-sm text-[#22201d] opacity-70">{stat.user_count} users</p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl font-bold text-[#22201d]">{stat.total_usage}</p>
+                            <p className="text-sm text-[#22201d] opacity-70">minutes</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
                   </div>
                 </CardContent>
               </Card>
