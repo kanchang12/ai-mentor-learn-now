@@ -1,102 +1,101 @@
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Badge } from "@/components/ui/badge";
 import { 
-  ArrowLeft,
-  Bot,
-  User,
-  Minimize2,
-  Maximize2,
-  BarChart3,
-  Upload,
-  Send,
+  ArrowLeft, 
+  BarChart3, 
+  Database, 
+  TrendingUp, 
   FileSpreadsheet,
-  TrendingUp
+  Brain,
+  Zap,
+  Play,
+  Clock,
+  Users
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useUsageTracking } from "@/hooks/useUsageTracking";
-import { UsageMeter } from "@/components/UsageMeter";
-import { AffiliateCard } from "@/components/AffiliateCard";
 
 const Data = () => {
-  const [prompt, setPrompt] = useState("");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [analysisResult, setAnalysisResult] = useState("");
-  const [chatMessage, setChatMessage] = useState("");
-  const [chatMinimized, setChatMinimized] = useState(false);
-  const { usageMinutes, isLimitReached, loading, trackUsage, trackAffiliateClick } = useUsageTracking('data');
-  
-  const [chatMessages, setChatMessages] = useState([
+  const tutorials = [
     {
       id: 1,
-      sender: "ai",
-      message: "Hello! I'm your AI data analysis assistant. I can help you analyze datasets, create visualizations, and extract insights from your data. Upload a CSV or describe your analysis needs!",
-      timestamp: "Just now"
+      title: "Excel Data Analysis with AI",
+      description: "Transform spreadsheets into insights using AI-powered analysis tools",
+      duration: "12 min",
+      level: "Beginner",
+      videoId: "8MNb_nw5dQo",
+      views: "24.5K"
+    },
+    {
+      id: 2,
+      title: "Google Sheets + AI Integration",
+      description: "Automate calculations and generate reports with AI in Google Sheets",
+      duration: "15 min",
+      level: "Intermediate",
+      videoId: "5dTK8qZHbhQ",
+      views: "18.2K"
+    },
+    {
+      id: 3,
+      title: "Power BI with AI Insights",
+      description: "Create dynamic dashboards and AI-powered visualizations",
+      duration: "18 min",
+      level: "Advanced",
+      videoId: "dUFIj8JGz0A",
+      views: "31.7K"
+    },
+    {
+      id: 4,
+      title: "SQL Database Analysis",
+      description: "Use AI to write complex SQL queries and analyze large datasets",
+      duration: "22 min",
+      level: "Advanced",
+      videoId: "HXV3zeQKqGY",
+      views: "15.8K"
+    },
+    {
+      id: 5,
+      title: "Data Visualization with Tableau",
+      description: "Build interactive dashboards and AI-enhanced visualizations",
+      duration: "16 min",
+      level: "Intermediate",
+      videoId: "jbkSRLYSojo",
+      views: "22.1K"
+    },
+    {
+      id: 6,
+      title: "Python Data Science Basics",
+      description: "Learn pandas, matplotlib, and AI-assisted data analysis",
+      duration: "25 min",
+      level: "Advanced",
+      videoId: "r-uOLxNrNk8",
+      views: "28.3K"
     }
-  ]);
+  ];
 
-  const analyzeData = async () => {
-    if (!prompt.trim() || isLimitReached) return;
-
-    setIsAnalyzing(true);
-    setAnalysisResult("");
-
-    // Simulate data analysis
-    setTimeout(() => {
-      setAnalysisResult(`Data Analysis Results for: "${prompt}"
-
-Key Insights:
-• Identified 3 major trends in your dataset
-• Found correlation coefficient of 0.82 between variables
-• Detected 5% outliers that may need attention
-• Recommended data cleaning steps for improved accuracy
-
-Statistical Summary:
-- Mean: 245.7
-- Median: 238.5
-- Standard Deviation: 42.3
-- Sample Size: 1,247 records
-
-Visualization suggestions:
-1. Time series plot for trend analysis
-2. Scatter plot for correlation visualization
-3. Box plot for outlier detection
-
-Next Steps:
-Consider implementing data preprocessing to handle missing values and normalize the distribution.`);
-      
-      trackUsage(2);
-      setIsAnalyzing(false);
-    }, 3000);
-  };
-
-  const sendChatMessage = () => {
-    if (!chatMessage.trim()) return;
-
-    const newUserMessage = {
-      id: Date.now(),
-      sender: "user",
-      message: chatMessage,
-      timestamp: "Just now"
-    };
-
-    setChatMessages(prev => [...prev, newUserMessage]);
-    setChatMessage("");
-
-    setTimeout(() => {
-      const aiResponse = {
-        id: Date.now() + 1,
-        sender: "ai", 
-        message: "Great question about data analysis! I recommend starting with exploratory data analysis (EDA) to understand your dataset structure, then applying statistical methods based on your specific goals.",
-        timestamp: "Just now"
-      };
-      setChatMessages(prev => [...prev, aiResponse]);
-    }, 1000);
-  };
+  const features = [
+    {
+      icon: Database,
+      title: "Database Integration",
+      description: "Connect to SQL, NoSQL, and cloud databases"
+    },
+    {
+      icon: BarChart3,
+      title: "Smart Visualizations",
+      description: "AI-generated charts and interactive dashboards"
+    },
+    {
+      icon: Brain,
+      title: "Predictive Analytics",
+      description: "Machine learning models for forecasting"
+    },
+    {
+      icon: FileSpreadsheet,
+      title: "Excel & Sheets",
+      description: "Advanced spreadsheet automation"
+    }
+  ];
 
   return (
     <div className="min-h-screen bg-[#fef9ed]">
@@ -104,218 +103,140 @@ Consider implementing data preprocessing to handle missing values and normalize 
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="text-[#22201d] hover:text-[#6cae75] hover:bg-[#e9ecf1]">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center border border-blue-500/30">
-                  <span className="text-2xl">📊</span>
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-[#22201d]">Data Analysis</h1>
-                  <p className="text-sm text-[#22201d] opacity-70">AI-powered data insights</p>
-                </div>
-              </div>
-            </div>
-
-            <UsageMeter 
-              usageMinutes={usageMinutes} 
-              isLimitReached={isLimitReached} 
-              loading={loading} 
-            />
+            <Link to="/dashboard" className="flex items-center space-x-2">
+              <ArrowLeft className="h-5 w-5 text-[#22201d]" />
+              <span className="text-[#22201d] font-medium">Back to Dashboard</span>
+            </Link>
+            <Link to="/" className="text-2xl font-bold text-blue-600">
+              HowToUseAI.uk
+            </Link>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Main Demo Section */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Data Analysis Demo */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-xl text-[#22201d] flex items-center">
-                  <BarChart3 className="h-5 w-5 mr-2 text-[#6cae75]" />
-                  AI Data Analyzer
-                </CardTitle>
-                <CardDescription className="text-[#22201d] opacity-70">
-                  Upload data or describe your analysis needs for AI-powered insights
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex space-x-2">
-                  <Textarea
-                    placeholder="Describe your data analysis needs... (e.g., 'Analyze sales trends over the last quarter', 'Find correlations in customer behavior data')"
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    className="flex-1 min-h-[100px] text-[#22201d]"
-                    disabled={isLimitReached}
-                  />
-                  <div className="flex flex-col space-y-2">
-                    <Button 
-                      variant="outline"
-                      size="sm"
-                      disabled={isLimitReached}
-                      className="border-gray-300"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload CSV
-                    </Button>
-                    <Button 
-                      onClick={analyzeData}
-                      disabled={!prompt.trim() || isAnalyzing || isLimitReached}
-                      className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
-                    >
-                      {isAnalyzing ? "Analyzing..." : "Analyze Data"}
-                    </Button>
-                  </div>
-                </div>
-                
-                {analysisResult && (
-                  <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
-                    <h4 className="font-medium text-[#22201d] mb-2 flex items-center">
-                      <TrendingUp className="h-4 w-4 mr-2" />
-                      Analysis Results:
-                    </h4>
-                    <pre className="text-[#22201d] whitespace-pre-wrap text-sm">{analysisResult}</pre>
-                  </div>
-                )}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-12">
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-indigo-500/30">
+              <BarChart3 className="h-8 w-8 text-indigo-600" />
+            </div>
+          </div>
+          <h1 className="text-4xl font-black text-[#22201d] mb-4">Data Analysis with AI</h1>
+          <p className="text-xl text-[#22201d] opacity-70 max-w-3xl mx-auto">
+            Transform raw data into actionable insights with AI-powered analysis tools and visualization techniques
+          </p>
+        </div>
 
-                {isLimitReached && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-red-800 text-sm">
-                      You've reached your daily limit of 30 minutes. Upgrade for unlimited access!
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* AI Chat Interface */}
-            <Card className={`bg-white border border-gray-200 rounded-[20px] shadow-lg transition-all duration-300 ${chatMinimized ? 'h-16' : 'h-96'}`}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-[#6cae75] to-[#5a9d64] rounded-lg flex items-center justify-center">
-                      <Bot className="h-4 w-4 text-white" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-base text-[#22201d]">Data Analysis Guide</CardTitle>
-                      <CardDescription className="text-xs text-[#22201d] opacity-70">Ask questions about data analysis</CardDescription>
-                    </div>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setChatMinimized(!chatMinimized)}
-                    className="text-[#22201d] opacity-70 hover:text-[#22201d] hover:bg-[#e9ecf1]"
-                  >
-                    {chatMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
-                  </Button>
-                </div>
-              </CardHeader>
-
-              {!chatMinimized && (
-                <CardContent className="pt-0 pb-3">
-                  <ScrollArea className="h-48 mb-4">
-                    <div className="space-y-3">
-                      {chatMessages.map((msg) => (
-                        <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`flex items-start space-x-2 max-w-[80%] ${
-                            msg.sender === 'user' ? 'flex-row-reverse space-x-reverse' : ''
-                          }`}>
-                            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
-                              msg.sender === 'user' 
-                                ? 'bg-[#6cae75]' 
-                                : 'bg-gradient-to-br from-[#6cae75] to-[#5a9d64]'
-                            }`}>
-                              {msg.sender === 'user' ? (
-                                <User className="h-3 w-3 text-white" />
-                              ) : (
-                                <Bot className="h-3 w-3 text-white" />
-                              )}
-                            </div>
-                            <div className={`p-2 rounded-lg text-sm ${
-                              msg.sender === 'user'
-                                ? 'bg-[#6cae75] text-white'
-                                : 'bg-[#e9ecf1] text-[#22201d]'
-                            }`}>
-                              {msg.message}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
-                  
-                  <div className="flex space-x-2">
-                    <Input
-                      placeholder="Ask about data analysis..."
-                      value={chatMessage}
-                      onChange={(e) => setChatMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
-                      className="text-sm bg-white border-gray-300 text-[#22201d] placeholder:text-[#22201d] placeholder:opacity-50"
+        {/* Tutorial Videos */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-[#22201d] mb-8">Video Tutorials</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {tutorials.map((tutorial) => (
+              <Card key={tutorial.id} className="bg-white border border-gray-200 rounded-[20px] hover:shadow-lg transition-shadow">
+                <div className="relative">
+                  <div className="aspect-video bg-gray-100 rounded-t-[20px] relative overflow-hidden">
+                    <iframe
+                      src={`https://www.youtube.com/embed/${tutorial.videoId}`}
+                      title={tutorial.title}
+                      className="w-full h-full"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
                     />
-                    <Button size="sm" onClick={sendChatMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
-                      <Send className="h-4 w-4" />
-                    </Button>
+                  </div>
+                  <div className="absolute top-4 left-4">
+                    <Badge className="bg-black/70 text-white hover:bg-black/80">
+                      <Play className="h-3 w-3 mr-1" />
+                      {tutorial.duration}
+                    </Badge>
+                  </div>
+                  <div className="absolute top-4 right-4">
+                    <Badge variant="secondary" className="bg-white/90">
+                      {tutorial.level}
+                    </Badge>
+                  </div>
+                </div>
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold text-[#22201d] mb-2">{tutorial.title}</h3>
+                  <p className="text-[#22201d] opacity-70 mb-4">{tutorial.description}</p>
+                  <div className="flex items-center justify-between text-sm text-[#22201d] opacity-50">
+                    <div className="flex items-center">
+                      <Users className="h-4 w-4 mr-1" />
+                      {tutorial.views} views
+                    </div>
+                    <div className="flex items-center">
+                      <Clock className="h-4 w-4 mr-1" />
+                      {tutorial.duration}
+                    </div>
                   </div>
                 </CardContent>
-              )}
-            </Card>
+              </Card>
+            ))}
           </div>
+        </div>
 
-          {/* Sidebar with Affiliate Tools */}
-          <div className="space-y-6">
-            <AffiliateCard
-              title="Observable"
-              description="Advanced data visualization and analysis platform for teams."
-              features={[
-                "Interactive notebooks",
-                "Real-time collaboration",
-                "Data visualization tools",
-                "JavaScript-based analytics"
-              ]}
-              ctaText="Start Free Trial"
-              affiliateUrl="https://observablehq.com/pricing"
-              commission="Referral bonus"
-              rating={4.6}
-              onAffiliateClick={trackAffiliateClick}
-              service="observable"
-            />
+        {/* Features */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-[#22201d] mb-8">What You'll Learn</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => {
+              const IconComponent = feature.icon;
+              return (
+                <Card key={index} className="bg-white border border-gray-200 rounded-[20px] text-center">
+                  <CardContent className="p-6">
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-indigo-500/30 mx-auto mb-4">
+                      <IconComponent className="h-6 w-6 text-indigo-600" />
+                    </div>
+                    <h3 className="text-lg font-bold text-[#22201d] mb-2">{feature.title}</h3>
+                    <p className="text-[#22201d] opacity-70">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
 
-            <AffiliateCard
-              title="Tableau"
-              description="Professional business intelligence and data visualization."
-              features={[
-                "Drag-and-drop interface",
-                "Advanced analytics",
-                "Dashboard creation",
-                "Enterprise integration"
-              ]}
-              ctaText="Get Started"
-              affiliateUrl="https://www.tableau.com/pricing"
-              commission="Partner program"
-              rating={4.7}
-              onAffiliateClick={trackAffiliateClick}
-              service="tableau"
-            />
+        {/* Interactive Demo */}
+        <div className="mb-16">
+          <Card className="bg-gradient-to-br from-indigo-50 to-blue-50 border-indigo-200 rounded-[20px]">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-indigo-500/30">
+                  <TrendingUp className="h-8 w-8 text-indigo-600" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl text-[#22201d]">Interactive Data Analysis Demo</CardTitle>
+              <CardDescription className="text-[#22201d] opacity-70">
+                Try our AI-powered data analysis tool with sample datasets
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="text-center">
+              <Button size="lg" className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
+                <Zap className="h-5 w-5 mr-2" />
+                Launch Demo
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
 
-            <Card className="bg-gradient-to-br from-[#6cae75]/10 to-[#5a9d64]/10 border border-[#6cae75]/30 rounded-[20px]">
-              <CardContent className="p-4 text-center">
-                <h3 className="font-semibold text-[#22201d] mb-2">Premium Analytics</h3>
-                <p className="text-sm text-[#22201d] opacity-70 mb-3">
-                  Get advanced analytics features and unlimited data processing.
-                </p>
-                <Button className="w-full bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
-                  Upgrade Now
-                </Button>
-              </CardContent>
-            </Card>
+        {/* CTA */}
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-[#22201d] mb-4">Ready to Master Data Analysis?</h2>
+          <p className="text-xl text-[#22201d] opacity-70 mb-8">
+            Start with our beginner tutorials and work your way up to advanced AI-powered analytics
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/general">
+              <Button size="lg" className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
+                Start Learning
+              </Button>
+            </Link>
+            <Link to="/billing">
+              <Button size="lg" variant="outline" className="rounded-[30px]">
+                Upgrade for Full Access
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
