@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,7 +20,7 @@ import { useAdminCheck } from "@/hooks/useAdminCheck";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { signOut } = useAuth();
-  const { isAdmin } = useAdminCheck();
+  const { isAdmin, loading: adminLoading } = useAdminCheck();
 
   const handleSignOut = async () => {
     await signOut();
@@ -102,7 +101,7 @@ const Dashboard = () => {
             </Link>
             
             <div className="flex items-center space-x-4">
-              {isAdmin && (
+              {!adminLoading && isAdmin && (
                 <Link to="/admin">
                   <Button variant="outline" size="sm" className="border-red-300 text-red-600 hover:bg-red-50">
                     <Shield className="h-4 w-4 mr-2" />
