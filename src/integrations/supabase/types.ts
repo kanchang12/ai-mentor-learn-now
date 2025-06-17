@@ -79,6 +79,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          subscription_type: Database["public"]["Enums"]["subscription_type"]
           updated_at: string
         }
         Insert: {
@@ -87,6 +88,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          subscription_type?: Database["public"]["Enums"]["subscription_type"]
           updated_at?: string
         }
         Update: {
@@ -95,6 +97,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          subscription_type?: Database["public"]["Enums"]["subscription_type"]
           updated_at?: string
         }
         Relationships: []
@@ -158,11 +161,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_subscription_type: {
+        Args: { _user_id: string }
+        Returns: Database["public"]["Enums"]["subscription_type"]
+      }
       has_role: {
         Args: {
           _user_id: string
           _role: Database["public"]["Enums"]["app_role"]
         }
+        Returns: boolean
+      }
+      has_unlimited_access: {
+        Args: { _user_id: string }
         Returns: boolean
       }
       update_usage_tracking: {
@@ -177,6 +188,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      subscription_type: "admin" | "paid" | "unpaid"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -293,6 +305,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      subscription_type: ["admin", "paid", "unpaid"],
     },
   },
 } as const

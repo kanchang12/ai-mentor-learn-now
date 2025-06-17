@@ -2,12 +2,14 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSubscription } from './useSubscription';
 
 export const useUsageTracking = (category: string) => {
   const [usageMinutes, setUsageMinutes] = useState(0);
   const [isLimitReached, setIsLimitReached] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const { hasUnlimitedAccess, loading: subscriptionLoading } = useSubscription();
 
   const getClientIP = async () => {
     try {
@@ -21,6 +23,14 @@ export const useUsageTracking = (category: string) => {
   };
 
   const checkUsage = async () => {
+    // If user has unlimited access, don't track usage
+    if (hasUnlimitedAccess) {
+      setUsageMinutes(0);
+      setIsLimitReached(false);
+      setLoading(false);
+      return;
+    }
+
     try {
       const ip = await getClientIP();
       const today = new Date().toISOString().split('T')[0];
@@ -49,6 +59,11 @@ export const useUsageTracking = (category: string) => {
   };
 
   const trackUsage = async (minutes: number) => {
+    // Don't track usage for unlimited users
+    if (hasUnlimitedAccess) {
+      return;
+    }
+
     try {
       const ip = await getClientIP();
       
@@ -91,16 +106,19 @@ export const useUsageTracking = (category: string) => {
   };
 
   useEffect(() => {
-    checkUsage();
-  }, [category]);
+    if (!subscriptionLoading) {
+      checkUsage();
+    }
+  }, [category, hasUnlimitedAccess, subscriptionLoading]);
 
-  const remainingMinutes = Math.max(0, 30 - usageMinutes);
+  const remainingMinutes = hasUnlimitedAccess ? Infinity : Math.max(0, 30 - usageMinutes);
 
   return {
-    usageMinutes,
+    usageMinutes: hasUnlimitedAccess ? 0 : usageMinutes,
     remainingMinutes,
-    isLimitReached,
-    loading,
+    isLimitReached: hasUnlimitedAccess ? false : isLimitReached,
+    loading: loading || subscriptionLoading,
+    hasUnlimitedAccess,
     trackUsage,
     trackAffiliateClick
   };

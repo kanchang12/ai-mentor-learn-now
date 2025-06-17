@@ -1,106 +1,212 @@
-import { ReactNode } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
+import { ArrowLeft, Send, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useContent } from "@/contexts/ContentContext";
+import { UsageMeter } from "./UsageMeter";
+import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { AffiliateCard } from "./AffiliateCard";
 import { VoiceAgent } from "./VoiceAgent";
+import { useToast } from "@/hooks/use-toast";
 
 interface CategoryPageLayoutProps {
   category: string;
-  title: string;
-  description: string;
-  icon: ReactNode;
-  videoId: string;
-  videoTitle: string;
-  videoDescription: string;
-  demoTitle: string;
-  demoDescription: string;
-  demoContent: ReactNode;
-  children?: ReactNode;
+  children?: React.ReactNode;
+  affiliateCards?: Array<{
+    title: string;
+    description: string;
+    buttonText: string;
+    buttonUrl: string;
+    service: string;
+  }>;
 }
 
-export const CategoryPageLayout = ({
-  category,
-  title,
-  description,
-  icon,
-  videoId,
-  videoTitle,
-  videoDescription,
-  demoTitle,
-  demoDescription,
-  demoContent,
-  children
-}: CategoryPageLayoutProps) => {
+export const CategoryPageLayout = ({ category, children, affiliateCards }: CategoryPageLayoutProps) => {
   const { getPageContent } = useContent();
-  const pageContent = getPageContent(category);
+  const { 
+    usageMinutes, 
+    isLimitReached, 
+    loading: usageLoading, 
+    hasUnlimitedAccess, 
+    trackUsage, 
+    trackAffiliateClick 
+  } = useUsageTracking(category);
+  const { toast } = useToast();
+  
+  const [input, setInput] = useState("");
+  const [response, setResponse] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const content = getPageContent(category);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!hasUnlimitedAccess && isLimitReached) {
+      toast({
+        title: "Daily Limit Reached",
+        description: "You've reached your 30-minute daily limit. Upgrade to Pro for unlimited access!",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!input.trim()) return;
+
+    setIsLoading(true);
+    const startTime = Date.now();
+
+    try {
+      // Simulate AI response processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setResponse(`AI Response for ${category}: ${input}`);
+      
+      // Track usage time (simulate 1 minute per request for demo)
+      const usedMinutes = 1;
+      await trackUsage(usedMinutes);
+      
+    } catch (error) {
+      console.error('Error processing request:', error);
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#fef9ed]">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link to="/dashboard">
-                <Button variant="ghost" size="sm" className="text-[#22201d] hover:text-[#6cae75] hover:bg-[#e9ecf1]">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Dashboard
-                </Button>
-              </Link>
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-xl flex items-center justify-center border border-blue-500/30">
-                  {icon}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between mb-4">
+            <Link to="/dashboard">
+              <Button variant="ghost" size="sm" className="text-[#22201d] hover:text-[#6cae75]">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <UsageMeter 
+              usageMinutes={usageMinutes} 
+              isLimitReached={isLimitReached} 
+              loading={usageLoading}
+              hasUnlimitedAccess={hasUnlimitedAccess}
+            />
+          </div>
+          <h1 className="text-3xl font-black text-[#22201d]">{content.title}</h1>
+          <p className="text-[#22201d] opacity-70 mt-2">{content.description}</p>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Video Section */}
+          <div className="space-y-6">
+            <Card className="bg-white border border-gray-200 rounded-[20px] overflow-hidden">
+              <CardContent className="p-0">
+                <div className="aspect-video">
+                  <iframe
+                    src={content.videoUrl}
+                    title={content.videoTitle}
+                    className="w-full h-full"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
                 </div>
-                <div>
-                  <h1 className="text-xl font-bold text-[#22201d]">{pageContent.title}</h1>
-                  <p className="text-sm text-[#22201d] opacity-70">{pageContent.description}</p>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-[#22201d] mb-2">{content.videoTitle}</h3>
+                  <p className="text-[#22201d] opacity-70">{content.videoDescription}</p>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
+
+            {/* Voice Agent */}
+            <VoiceAgent category={category} />
+          </div>
+
+          {/* AI Chat Section */}
+          <div className="space-y-6">
+            <Card className="bg-white border border-gray-200 rounded-[20px]">
+              <CardHeader>
+                <CardTitle className="text-[#22201d]">AI Assistant</CardTitle>
+                <CardDescription>Ask questions and get instant help</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <Textarea
+                    placeholder={`Ask me anything about ${category}...`}
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    className="min-h-[100px] resize-none border-gray-200 focus:border-[#6cae75] focus:ring-[#6cae75]"
+                    disabled={!hasUnlimitedAccess && isLimitReached}
+                  />
+                  <Button 
+                    type="submit" 
+                    disabled={isLoading || (!hasUnlimitedAccess && isLimitReached)} 
+                    className="w-full bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="h-4 w-4 mr-2" />
+                        {!hasUnlimitedAccess && isLimitReached ? 'Upgrade to Continue' : 'Send Message'}
+                      </>
+                    )}
+                  </Button>
+                </form>
+
+                {!hasUnlimitedAccess && isLimitReached && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-red-800 text-sm">
+                      You've reached your daily 30-minute limit. 
+                      <Link to="/billing" className="underline font-medium ml-1">
+                        Upgrade to Pro
+                      </Link> for unlimited access!
+                    </p>
+                  </div>
+                )}
+
+                {response && (
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <p className="text-[#22201d] text-sm">{response}</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Custom children content */}
+            {children}
           </div>
         </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Video Section */}
-          <Card className="bg-white border border-gray-200 rounded-[20px] overflow-hidden">
-            <div className="aspect-video">
-              <iframe
-                src={pageContent.videoUrl}
-                title={pageContent.videoTitle}
-                className="w-full h-full"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                loading="lazy"
-              />
+        {/* Affiliate Cards */}
+        {affiliateCards && affiliateCards.length > 0 && (
+          <div className="mt-16">
+            <h2 className="text-2xl font-bold text-[#22201d] mb-8 text-center">Recommended Tools</h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {affiliateCards.map((card, index) => (
+                <AffiliateCard
+                  key={index}
+                  title={card.title}
+                  description={card.description}
+                  buttonText={card.buttonText}
+                  buttonUrl={card.buttonUrl}
+                  onButtonClick={() => trackAffiliateClick(card.service)}
+                />
+              ))}
             </div>
-            <CardContent className="p-6">
-              <h2 className="text-2xl font-bold text-[#22201d] mb-2">{pageContent.videoTitle}</h2>
-              <p className="text-[#22201d] opacity-70">{pageContent.videoDescription}</p>
-            </CardContent>
-          </Card>
-
-          {/* Demo Section */}
-          <Card className="bg-white border border-gray-200 rounded-[20px]">
-            <CardHeader>
-              <CardTitle className="text-[#22201d]">{demoTitle}</CardTitle>
-              <CardDescription className="text-[#22201d] opacity-70">{demoDescription}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {demoContent}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Affiliate Section */}
-        {children && (
-          <div className="mt-8">
-            {children}
           </div>
         )}
       </div>
