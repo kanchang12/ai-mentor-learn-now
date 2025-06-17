@@ -32,7 +32,7 @@ const defaultContent: Record<string, PageContent> = {
   homepage: {
     title: "Master AI Tools with Expert Tutorials",
     description: "Learn how to use Perplexity AI, Leonardo AI, Jasper AI and more with step-by-step video tutorials and hands-on practice",
-    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4?si=ePAK5_lNfBAFg5cG",
     videoTitle: "How to Use AI Tools - Complete Beginner's Guide",
     videoDescription: "Get started with the most powerful AI tools including Perplexity for research, Leonardo for images, and Jasper for writing"
   },
@@ -60,7 +60,7 @@ const defaultContent: Record<string, PageContent> = {
   music: {
     title: "AI Music Generator",
     description: "Create AI-generated music and soundtracks with professional tools",
-    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4?si=ePAK5_lNfBAFg5cG",
     videoTitle: "AI Music Generation Complete Guide", 
     videoDescription: "Learn to create professional music tracks using AI-powered composition tools"
   },
@@ -74,7 +74,7 @@ const defaultContent: Record<string, PageContent> = {
   website: {
     title: "AI Website Builder",
     description: "Build professional websites with AI assistance and modern development tools",
-    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4?si=ePAK5_lNfBAFg5cG",
     videoTitle: "Building Websites with AI - Complete Course", 
     videoDescription: "Create professional websites using AI-powered design and development tools"
   }
