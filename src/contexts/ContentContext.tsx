@@ -1,212 +1,72 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, ReactNode } from 'react';
 
 interface PageContent {
-  id: string;
   title: string;
   description: string;
   videoUrl: string;
   videoTitle: string;
   videoDescription: string;
-  heroImage?: string;
-  backgroundImage?: string;
-  logoUrl?: string;
-  ctaButtonText?: string;
-  ctaButtonUrl?: string;
-  socialLinks?: {
-    twitter?: string;
-    youtube?: string;
-    linkedin?: string;
-    facebook?: string;
-  };
 }
 
 interface ContentContextType {
-  getPageContent: (pageId: string) => PageContent;
-  updatePageContent: (pageId: string, content: Partial<PageContent>) => void;
-  getAllContent: () => Record<string, PageContent>;
-  setAllContent: (content: Record<string, PageContent>) => void;
+  getPageContent: (category: string) => PageContent;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 const defaultContent: Record<string, PageContent> = {
-  homepage: {
-    id: "homepage",
-    title: "Master AI Tools with Real API Integrations",
-    description: "Learn and use the most powerful AI tools through hands-on practice. Connect with Perplexity, Leonardo AI, Jasper, Claude, and more with real API integrations.",
-    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
-    videoTitle: "Complete AI Mastery Course - 2024 Edition",
-    videoDescription: "Everything you need to know about AI tools with real API integrations. Perfect for beginners and advanced users.",
-    heroImage: "",
-    backgroundImage: "",
-    logoUrl: "",
-    ctaButtonText: "Start Learning",
-    ctaButtonUrl: "/dashboard",
-    socialLinks: {
-      twitter: "",
-      youtube: "",
-      linkedin: "",
-      facebook: ""
-    }
-  },
   general: {
-    id: "general",
-    title: "AI Chat with Perplexity API",
-    description: "Connect directly to Perplexity API for real-time AI conversations with web search capabilities.",
-    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
-    videoTitle: "Master Perplexity AI Integration",
-    videoDescription: "Learn to integrate and use Perplexity API for powerful AI conversations with real-time data.",
-    heroImage: "",
-    backgroundImage: "",
-    logoUrl: "",
-    ctaButtonText: "Try Perplexity",
-    ctaButtonUrl: "/general",
-    socialLinks: {
-      twitter: "",
-      youtube: "",
-      linkedin: "",
-      facebook: ""
-    }
+    title: "General AI Assistant",
+    description: "Chat with AI and get instant answers",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoTitle: "Getting Started with AI Chat",
+    videoDescription: "Learn how to effectively communicate with AI assistants"
   },
   writing: {
-    id: "writing",
-    title: "AI Writing with Jasper API",
-    description: "Direct integration with Jasper AI for professional content creation and copywriting.",
-    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
-    videoTitle: "Jasper AI Writing Integration",
-    videoDescription: "Master content creation using Jasper AI's powerful writing API and tools.",
-    heroImage: "",
-    backgroundImage: "",
-    logoUrl: "",
-    ctaButtonText: "Start Writing",
-    ctaButtonUrl: "/writing",
-    socialLinks: {
-      twitter: "",
-      youtube: "",
-      linkedin: "",
-      facebook: ""
-    }
+    title: "AI Writing Assistant", 
+    description: "Create professional content with AI",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoTitle: "AI Writing Mastery",
+    videoDescription: "Learn to create compelling content with AI tools"
   },
   images: {
-    id: "images",
-    title: "AI Image Generation with Leonardo AI",
-    description: "Create stunning visuals using Leonardo AI's powerful image generation API.",
-    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
-    videoTitle: "Leonardo AI Image Generation Guide",
-    videoDescription: "Complete guide to generating professional images using Leonardo AI API integration.",
-    heroImage: "",
-    backgroundImage: "",
-    logoUrl: "",
-    ctaButtonText: "Generate Images",
-    ctaButtonUrl: "/images",
-    socialLinks: {
-      twitter: "",
-      youtube: "",
-      linkedin: "",
-      facebook: ""
-    }
+    title: "AI Image Generator",
+    description: "Generate and edit images with AI",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", 
+    videoTitle: "AI Image Generation Guide",
+    videoDescription: "Master the art of AI image creation"
   },
-  business: {
-    id: "business",
-    title: "Business Automation with Make.com",
-    description: "Automate your business workflows using Make.com's powerful visual automation platform.",
-    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
-    videoTitle: "Make.com Business Automation Guide",
-    videoDescription: "Learn to create powerful business automations using Make.com webhooks and integrations.",
-    heroImage: "",
-    backgroundImage: "",
-    logoUrl: "",
-    ctaButtonText: "Automate Now",
-    ctaButtonUrl: "/business",
-    socialLinks: {
-      twitter: "",
-      youtube: "",
-      linkedin: "",
-      facebook: ""
-    }
+  music: {
+    title: "AI Music Generator",
+    description: "Create AI-generated music and soundtracks",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoTitle: "AI Music Generation with Mubert", 
+    videoDescription: "Learn to create professional music with AI tools"
   },
   data: {
-    id: "data",
-    title: "AI Data Analysis with Claude",
-    description: "Analyze data and extract insights using Claude AI's advanced reasoning capabilities.",
-    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
-    videoTitle: "Claude AI Data Analysis Guide",
-    videoDescription: "Master data analysis techniques using Claude AI's powerful reasoning and analysis capabilities.",
-    heroImage: "",
-    backgroundImage: "",
-    logoUrl: "",
-    ctaButtonText: "Analyze Data",
-    ctaButtonUrl: "/data",
-    socialLinks: {
-      twitter: "",
-      youtube: "",
-      linkedin: "",
-      facebook: ""
-    }
+    title: "AI Data Analysis",
+    description: "Analyze data and extract insights with AI", 
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoTitle: "Data Analysis with AI",
+    videoDescription: "Transform your data into actionable insights"
   },
   website: {
-    id: "website",
-    title: "AI Website Building with Wix",
-    description: "Build professional websites using Wix's AI-powered design tools and templates.",
-    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
-    videoTitle: "Wix AI Website Building Tutorial",
-    videoDescription: "Learn to create professional websites using Wix's AI design intelligence and powerful features.",
-    heroImage: "",
-    backgroundImage: "",
-    logoUrl: "",
-    ctaButtonText: "Build Website",
-    ctaButtonUrl: "/website",
-    socialLinks: {
-      twitter: "",
-      youtube: "",
-      linkedin: "",
-      facebook: ""
-    }
+    title: "AI Website Builder",
+    description: "Build websites with AI assistance",
+    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoTitle: "Building Websites with AI", 
+    videoDescription: "Create professional websites using AI tools"
   }
 };
 
-export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [content, setContent] = useState<Record<string, PageContent>>(defaultContent);
-
-  useEffect(() => {
-    const savedContent = localStorage.getItem('admin-content');
-    if (savedContent) {
-      try {
-        setContent(JSON.parse(savedContent));
-      } catch (error) {
-        console.error('Error loading saved content:', error);
-      }
-    }
-  }, []);
-
-  const getPageContent = (pageId: string): PageContent => {
-    return content[pageId] || defaultContent[pageId];
-  };
-
-  const updatePageContent = (pageId: string, newContent: Partial<PageContent>) => {
-    const updatedContent = {
-      ...content,
-      [pageId]: { ...content[pageId], ...newContent }
-    };
-    setContent(updatedContent);
-    localStorage.setItem('admin-content', JSON.stringify(updatedContent));
-  };
-
-  const getAllContent = () => content;
-
-  const setAllContent = (newContent: Record<string, PageContent>) => {
-    setContent(newContent);
-    localStorage.setItem('admin-content', JSON.stringify(newContent));
+export const ContentProvider = ({ children }: { children: ReactNode }) => {
+  const getPageContent = (category: string): PageContent => {
+    return defaultContent[category] || defaultContent.general;
   };
 
   return (
-    <ContentContext.Provider value={{
-      getPageContent,
-      updatePageContent,
-      getAllContent,
-      setAllContent
-    }}>
+    <ContentContext.Provider value={{ getPageContent }}>
       {children}
     </ContentContext.Provider>
   );

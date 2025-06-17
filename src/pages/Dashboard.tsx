@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -6,7 +5,7 @@ import {
   MessageSquare, 
   Image, 
   PenTool, 
-  BookOpen, 
+  Music, 
   BarChart3, 
   Globe,
   ArrowRight,
@@ -61,14 +60,14 @@ const Dashboard = () => {
       href: "/images"
     },
     {
-      id: "book",
-      title: "Write a Book",
-      description: "Write complete books with AI-powered assistance",
-      icon: BookOpen,
+      id: "music",
+      title: "Music Generation",
+      description: "Create AI-generated music and soundtracks with Mubert",
+      icon: Music,
       color: "from-orange-500/20 to-red-500/20",
       borderColor: "border-orange-500/30",
       iconColor: "text-orange-600",
-      href: "/book"
+      href: "/music"
     },
     {
       id: "data",
