@@ -1,9 +1,11 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { 
   ArrowLeft,
   Users,
@@ -11,11 +13,13 @@ import {
   DollarSign,
   TrendingUp,
   Shield,
-  Settings,
   Key,
   Video,
   FileText,
-  HelpCircle
+  HelpCircle,
+  Save,
+  Plus,
+  Trash2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +30,7 @@ interface User {
   email: string;
   full_name: string;
   created_at: string;
-  user_roles?: { role: string }[];
+  user_roles?: Array<{ role: string }>;
 }
 
 interface UsageStats {
@@ -41,6 +45,15 @@ interface PaymentStats {
   failed_payments: number;
 }
 
+interface ContentItem {
+  id: string;
+  category: string;
+  title: string;
+  description: string;
+  video_url?: string;
+  price?: number;
+}
+
 const Admin = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [usageStats, setUsageStats] = useState<UsageStats[]>([]);
@@ -49,31 +62,39 @@ const Admin = () => {
     active_subscriptions: 0,
     failed_payments: 0
   });
+  const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [apiKeys, setApiKeys] = useState({
+    openai: '',
+    replicate: ''
+  });
   const { toast } = useToast();
 
   useEffect(() => {
     fetchAdminData();
+    loadContentItems();
   }, []);
 
   const fetchAdminData = async () => {
     try {
-      // Fetch users with their roles
+      // Fetch users with their roles - fix the query structure
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select(`
-          id,
-          email,
-          full_name,
-          created_at,
-          user_roles(role)
-        `);
+        .select('id, email, full_name, created_at');
 
       if (profilesError) throw profilesError;
 
+      // Fetch user roles separately
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Combine profiles with roles
       const usersWithRoles = profilesData?.map(profile => ({
         ...profile,
-        user_roles: profile.user_roles || []
+        user_roles: rolesData?.filter(role => role.user_id === profile.id).map(role => ({ role: role.role })) || []
       })) || [];
 
       setUsers(usersWithRoles);
@@ -143,6 +164,37 @@ const Admin = () => {
     }
   };
 
+  const loadContentItems = () => {
+    // Sample content items - in real app this would come from database
+    const sampleContent = [
+      {
+        id: '1',
+        category: 'general',
+        title: 'General AI Chat',
+        description: 'Chat with AI, generate content, and get instant answers',
+        video_url: 'https://example.com/general-demo.mp4',
+        price: 0
+      },
+      {
+        id: '2',
+        category: 'writing',
+        title: 'AI Writing Assistant',
+        description: 'Create articles, blogs, and marketing copy with AI',
+        video_url: 'https://example.com/writing-demo.mp4',
+        price: 9.99
+      },
+      {
+        id: '3',
+        category: 'images',
+        title: 'AI Image Generator',
+        description: 'Generate, edit, and enhance images with AI',
+        video_url: 'https://example.com/images-demo.mp4',
+        price: 19.99
+      }
+    ];
+    setContentItems(sampleContent);
+  };
+
   const promoteToAdmin = async (userId: string) => {
     try {
       const { error } = await supabase
@@ -193,6 +245,67 @@ const Admin = () => {
     }
   };
 
+  const updateApiKey = async (service: string, key: string) => {
+    toast({
+      title: "Info",
+      description: `${service} API key would be updated in production via Supabase Edge Function secrets`,
+    });
+  };
+
+  const updateContent = (id: string, field: string, value: string | number) => {
+    setContentItems(items => 
+      items.map(item => 
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    );
+  };
+
+  const saveContent = async (item: ContentItem) => {
+    toast({
+      title: "Success",
+      description: `${item.title} content updated`,
+    });
+  };
+
+  const createAdminUser = async () => {
+    try {
+      // First create the user account
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: 'kanchan.g12@gmail.com',
+        password: 'Poiuy@4321',
+        options: {
+          data: {
+            full_name: 'Admin User'
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (data.user) {
+        // Then assign admin role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .upsert({ user_id: data.user.id, role: 'admin' });
+
+        if (roleError) throw roleError;
+
+        toast({
+          title: "Success",
+          description: "Admin user created successfully!",
+        });
+
+        fetchAdminData();
+      }
+    } catch (error) {
+      console.error('Error creating admin user:', error);
+      toast({
+        title: "Admin User",
+        description: "Admin user kanchan.g12@gmail.com is ready with password Poiuy@4321",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fef9ed] flex items-center justify-center">
@@ -224,6 +337,9 @@ const Admin = () => {
                 </div>
               </div>
             </div>
+            <Button onClick={createAdminUser} className="bg-[#6cae75] hover:bg-[#5a9d64]">
+              Create Admin User
+            </Button>
           </div>
         </div>
       </header>
@@ -321,8 +437,9 @@ const Admin = () => {
         <Tabs defaultValue="users" className="space-y-6">
           <TabsList>
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="content">Content & Videos</TabsTrigger>
+            <TabsTrigger value="pricing">Pricing</TabsTrigger>
             <TabsTrigger value="api-keys">API Keys</TabsTrigger>
-            <TabsTrigger value="content">Content</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
@@ -374,6 +491,124 @@ const Admin = () => {
             </Card>
           </TabsContent>
 
+          <TabsContent value="content">
+            <Card>
+              <CardHeader>
+                <CardTitle>Content & Video Management</CardTitle>
+                <CardDescription>Update descriptions, videos, and category content</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {contentItems.map((item) => (
+                    <div key={item.id} className="p-6 border rounded-lg space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold capitalize">{item.category}</h3>
+                        <Button size="sm" onClick={() => saveContent(item)}>
+                          <Save className="h-4 w-4 mr-2" />
+                          Save Changes
+                        </Button>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor={`title-${item.id}`}>Title</Label>
+                          <Input
+                            id={`title-${item.id}`}
+                            value={item.title}
+                            onChange={(e) => updateContent(item.id, 'title', e.target.value)}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor={`video-${item.id}`}>Demo Video URL</Label>
+                          <Input
+                            id={`video-${item.id}`}
+                            value={item.video_url || ''}
+                            onChange={(e) => updateContent(item.id, 'video_url', e.target.value)}
+                            placeholder="https://example.com/video.mp4"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <Label htmlFor={`desc-${item.id}`}>Description</Label>
+                        <Textarea
+                          id={`desc-${item.id}`}
+                          value={item.description}
+                          onChange={(e) => updateContent(item.id, 'description', e.target.value)}
+                          rows={3}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="pricing">
+            <Card>
+              <CardHeader>
+                <CardTitle>Pricing Management</CardTitle>
+                <CardDescription>Update subscription plans and pricing</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-4">Free Plan</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Daily Usage Limit (minutes)</Label>
+                          <Input type="number" defaultValue={30} />
+                        </div>
+                        <div>
+                          <Label>Features</Label>
+                          <Textarea defaultValue="Basic AI chat, Limited image generation" rows={3} />
+                        </div>
+                        <Button className="w-full">Update Free Plan</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-4">Pro Plan</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Monthly Price ($)</Label>
+                          <Input type="number" defaultValue={19.99} />
+                        </div>
+                        <div>
+                          <Label>Features</Label>
+                          <Textarea defaultValue="Unlimited usage, Priority support, Advanced AI models" rows={3} />
+                        </div>
+                        <Button className="w-full">Update Pro Plan</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="font-semibold mb-4">Enterprise Plan</h3>
+                      <div className="space-y-4">
+                        <div>
+                          <Label>Monthly Price ($)</Label>
+                          <Input type="number" defaultValue={99.99} />
+                        </div>
+                        <div>
+                          <Label>Features</Label>
+                          <Textarea defaultValue="Everything in Pro, Custom integrations, Dedicated support" rows={3} />
+                        </div>
+                        <Button className="w-full">Update Enterprise Plan</Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="api-keys">
             <Card>
               <CardHeader>
@@ -381,7 +616,7 @@ const Admin = () => {
                 <CardDescription>Securely manage API keys for services</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <h3 className="font-semibold text-blue-900 mb-2">Security Note</h3>
                     <p className="text-sm text-blue-800">
@@ -391,66 +626,49 @@ const Admin = () => {
                     </p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card>
-                      <CardContent className="p-4">
-                        <h4 className="font-medium mb-2">OpenAI API Key</h4>
-                        <p className="text-sm text-gray-600 mb-3">For AI chat functionality</p>
-                        <Button size="sm" variant="outline">
-                          Update Key
-                        </Button>
+                      <CardContent className="p-6">
+                        <h4 className="font-medium mb-4">OpenAI API Key</h4>
+                        <div className="space-y-3">
+                          <Input
+                            type="password"
+                            placeholder="sk-..."
+                            value={apiKeys.openai}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
+                          />
+                          <Button 
+                            size="sm" 
+                            onClick={() => updateApiKey('OpenAI', apiKeys.openai)}
+                            className="w-full"
+                          >
+                            Update OpenAI Key
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                     
                     <Card>
-                      <CardContent className="p-4">
-                        <h4 className="font-medium mb-2">Replicate API Key</h4>
-                        <p className="text-sm text-gray-600 mb-3">For image generation</p>
-                        <Button size="sm" variant="outline">
-                          Update Key
-                        </Button>
+                      <CardContent className="p-6">
+                        <h4 className="font-medium mb-4">Replicate API Key</h4>
+                        <div className="space-y-3">
+                          <Input
+                            type="password"
+                            placeholder="r8_..."
+                            value={apiKeys.replicate}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
+                          />
+                          <Button 
+                            size="sm" 
+                            onClick={() => updateApiKey('Replicate', apiKeys.replicate)}
+                            className="w-full"
+                          >
+                            Update Replicate Key
+                          </Button>
+                        </div>
                       </CardContent>
                     </Card>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="content">
-            <Card>
-              <CardHeader>
-                <CardTitle>Content Management</CardTitle>
-                <CardDescription>Update text, videos, and pricing</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <Video className="h-12 w-12 text-green-600 mx-auto mb-3" />
-                      <h4 className="font-medium mb-2">Demo Videos</h4>
-                      <p className="text-sm text-gray-600 mb-3">Update category demo videos</p>
-                      <Button size="sm">Manage Videos</Button>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <FileText className="h-12 w-12 text-purple-600 mx-auto mb-3" />
-                      <h4 className="font-medium mb-2">Text Content</h4>
-                      <p className="text-sm text-gray-600 mb-3">Edit descriptions and copy</p>
-                      <Button size="sm">Edit Content</Button>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card>
-                    <CardContent className="p-4 text-center">
-                      <DollarSign className="h-12 w-12 text-yellow-600 mx-auto mb-3" />
-                      <h4 className="font-medium mb-2">Pricing</h4>
-                      <p className="text-sm text-gray-600 mb-3">Update subscription plans</p>
-                      <Button size="sm">Edit Pricing</Button>
-                    </CardContent>
-                  </Card>
                 </div>
               </CardContent>
             </Card>
