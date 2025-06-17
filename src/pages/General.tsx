@@ -16,37 +16,35 @@ import {
   Maximize2,
   Sparkles,
   Mic,
-  MicOff
+  MicOff,
+  Image as ImageIcon,
+  Type
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useUsageTracking } from "@/hooks/useUsageTracking";
 import { UsageMeter } from "@/components/UsageMeter";
 import { AffiliateCard } from "@/components/AffiliateCard";
+import { supabase } from "@/integrations/supabase/client";
 
 const General = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationType, setGenerationType] = useState<'text' | 'image'>('text');
   const [chatMessage, setChatMessage] = useState("");
   const [chatMinimized, setChatMinimized] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const { usageMinutes, isLimitReached, loading, trackUsage, trackAffiliateClick, remainingMinutes } = useUsageTracking('general');
   
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
       sender: "ai",
-      message: "Hello! I'm your AI assistant powered by multiple models. I can help with general tasks, answer questions, and guide you through using AI tools. What would you like to explore?",
+      message: "Hello! I'm your AI assistant powered by multiple models. I can help with text generation and image creation. What would you like to explore?",
       timestamp: "Just now"
     }
   ]);
-
-  // Voice recognition setup
-  useEffect(() => {
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      // Voice recognition is supported
-    }
-  }, []);
 
   const startListening = () => {
     if ('webkitSpeechRecognition' in window) {
@@ -70,12 +68,28 @@ const General = () => {
     if (!prompt.trim() || isLimitReached) return;
 
     setIsGenerating(true);
+    setResponse("");
+    setGeneratedImage(null);
+
     try {
-      // Simulate API call - replace with actual Perplexity API
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      setResponse(`Here's a comprehensive response to: "${prompt}"\n\nThis is a demo response. In production, this would be powered by Perplexity API providing real-time AI assistance with web search capabilities.`);
-      await trackUsage(2); // Track 2 minutes of usage
+      const { data, error } = await supabase.functions.invoke('replicate-generate', {
+        body: { 
+          prompt, 
+          type: generationType 
+        }
+      });
+
+      if (error) throw error;
+
+      if (generationType === 'image') {
+        setGeneratedImage(data.output[0]);
+      } else {
+        setResponse(Array.isArray(data.output) ? data.output.join('') : data.output);
+      }
+
+      await trackUsage(2);
     } catch (error) {
+      console.error('Generation error:', error);
       setResponse("Sorry, there was an error generating the response. Please try again.");
     } finally {
       setIsGenerating(false);
@@ -125,7 +139,7 @@ const General = () => {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-[#22201d]">General AI Assistant</h1>
-                  <p className="text-sm text-[#22201d] opacity-70">Powered by Perplexity & Replicate APIs</p>
+                  <p className="text-sm text-[#22201d] opacity-70">Powered by Replicate & OpenAI APIs</p>
                 </div>
               </div>
             </div>
@@ -151,13 +165,35 @@ const General = () => {
                   AI Assistant Demo
                 </CardTitle>
                 <CardDescription className="text-[#22201d] opacity-70">
-                  Try our AI assistant powered by multiple models. Ask anything!
+                  Try our AI assistant powered by multiple models. Generate text or images!
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="flex space-x-2 mb-4">
+                  <Button
+                    variant={generationType === 'text' ? 'default' : 'outline'}
+                    onClick={() => setGenerationType('text')}
+                    className={generationType === 'text' ? 'bg-[#6cae75] hover:bg-[#5a9d64]' : ''}
+                  >
+                    <Type className="h-4 w-4 mr-2" />
+                    Text
+                  </Button>
+                  <Button
+                    variant={generationType === 'image' ? 'default' : 'outline'}
+                    onClick={() => setGenerationType('image')}
+                    className={generationType === 'image' ? 'bg-[#6cae75] hover:bg-[#5a9d64]' : ''}
+                  >
+                    <ImageIcon className="h-4 w-4 mr-2" />
+                    Image
+                  </Button>
+                </div>
+
                 <div className="flex space-x-2">
                   <Textarea
-                    placeholder="Ask me anything... (e.g., 'Explain quantum computing', 'Write a poem about AI')"
+                    placeholder={generationType === 'text' 
+                      ? "Ask me anything... (e.g., 'Explain quantum computing', 'Write a poem about AI')"
+                      : "Describe an image... (e.g., 'A futuristic city at sunset', 'A cute robot playing guitar')"
+                    }
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     className="flex-1 min-h-[100px] text-[#22201d]"
@@ -178,15 +214,26 @@ const General = () => {
                       disabled={!prompt.trim() || isGenerating || isLimitReached}
                       className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
                     >
-                      {isGenerating ? "Generating..." : "Ask AI"}
+                      {isGenerating ? "Generating..." : `Generate ${generationType}`}
                     </Button>
                   </div>
                 </div>
                 
-                {response && (
+                {response && generationType === 'text' && (
                   <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
                     <h4 className="font-medium text-[#22201d] mb-2">AI Response:</h4>
                     <p className="text-[#22201d] whitespace-pre-wrap">{response}</p>
+                  </div>
+                )}
+
+                {generatedImage && generationType === 'image' && (
+                  <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
+                    <h4 className="font-medium text-[#22201d] mb-2">Generated Image:</h4>
+                    <img 
+                      src={generatedImage} 
+                      alt="Generated" 
+                      className="max-w-full h-auto rounded-lg"
+                    />
                   </div>
                 )}
 
@@ -281,7 +328,7 @@ const General = () => {
               description="Access 100+ AI models with one API. Perfect for developers and businesses."
               features={[
                 "100+ pre-trained models",
-                "Custom model hosting",
+                "Custom model hosting", 
                 "Pay-per-use pricing",
                 "Enterprise-grade infrastructure"
               ]}
@@ -299,7 +346,7 @@ const General = () => {
               features={[
                 "GPT-4 & GPT-3.5 Turbo",
                 "DALL-E image generation",
-                "Whisper speech-to-text",
+                "Whisper speech-to-text", 
                 "Function calling"
               ]}
               ctaText="Start Building"

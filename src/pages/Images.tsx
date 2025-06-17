@@ -1,15 +1,11 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { 
-  PlayCircle, 
-  Clock, 
-  CheckCircle, 
   ArrowLeft,
   MessageSquare,
   Send,
@@ -17,65 +13,56 @@ import {
   User,
   Minimize2,
   Maximize2,
-  Image
+  Image as ImageIcon,
+  Sparkles,
+  Download
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { UsageMeter } from "@/components/UsageMeter";
+import { AffiliateCard } from "@/components/AffiliateCard";
+import { supabase } from "@/integrations/supabase/client";
 
 const Images = () => {
-  const [selectedVideo, setSelectedVideo] = useState(0);
+  const [prompt, setPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const [chatMessage, setChatMessage] = useState("");
   const [chatMinimized, setChatMinimized] = useState(false);
+  const { usageMinutes, isLimitReached, loading, trackUsage, trackAffiliateClick } = useUsageTracking('images');
+  
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
       sender: "ai",
-      message: "Hello! I'm your AI companion for image generation. I can help you understand Midjourney, DALL-E, and other AI art tools. What would you like to learn about?",
+      message: "Hello! I'm your AI companion for image generation. I can help you understand Midjourney, DALL-E, Stability AI and other AI art tools. What would you like to create?",
       timestamp: "Just now"
     }
   ]);
 
-  const tutorials = [
-    {
-      id: 1,
-      title: "Midjourney Mastery",
-      description: "Create stunning images with advanced Midjourney prompting techniques",
-      duration: "25 min",
-      difficulty: "Beginner",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 2,
-      title: "DALL-E 3 Professional Usage",
-      description: "Generate high-quality images for business and creative projects",
-      duration: "20 min",
-      difficulty: "Intermediate",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 3,
-      title: "Stable Diffusion Setup",
-      description: "Install and configure Stable Diffusion for unlimited image generation",
-      duration: "30 min",
-      difficulty: "Advanced",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 4,
-      title: "Image Editing with AI",
-      description: "Enhance and modify images using AI-powered editing tools",
-      duration: "18 min",
-      difficulty: "Intermediate",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+  const generateImage = async () => {
+    if (!prompt.trim() || isLimitReached) return;
+
+    setIsGenerating(true);
+    setGeneratedImage(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('stability-generate', {
+        body: { prompt }
+      });
+
+      if (error) throw error;
+
+      setGeneratedImage(data.output[0]);
+      await trackUsage(3); // Image generation takes more time
+    } catch (error) {
+      console.error('Image generation error:', error);
+    } finally {
+      setIsGenerating(false);
     }
-  ];
+  };
 
-  const currentVideo = tutorials[selectedVideo];
-
-  const sendMessage = () => {
+  const sendChatMessage = () => {
     if (!chatMessage.trim()) return;
 
     const newUserMessage = {
@@ -99,6 +86,17 @@ const Images = () => {
     }, 1000);
   };
 
+  const downloadImage = () => {
+    if (!generatedImage) return;
+    
+    const link = document.createElement('a');
+    link.href = generatedImage;
+    link.download = 'generated-image.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen bg-[#fef9ed]">
       {/* Header */}
@@ -118,142 +116,84 @@ const Images = () => {
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-[#22201d]">Image Generation</h1>
-                  <p className="text-sm text-[#22201d] opacity-70">Master Midjourney, DALL-E, and visual AI creation</p>
+                  <p className="text-sm text-[#22201d] opacity-70">Powered by Stability AI & DALL-E</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-[#e9ecf1] rounded-lg px-3 py-2">
-                <Clock className="h-4 w-4 text-[#22201d]" />
-                <span className="text-sm font-medium text-[#22201d]">24 minutes left</span>
-              </div>
-            </div>
+            <UsageMeter 
+              usageMinutes={usageMinutes} 
+              isLimitReached={isLimitReached} 
+              loading={loading} 
+            />
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Video Player Section */}
+          {/* Main Demo Section */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Video Player */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardContent className="p-0">
-                <div className="aspect-video bg-gray-100 rounded-t-[20px] flex items-center justify-center relative overflow-hidden">
-                  <iframe
-                    src={currentVideo.videoUrl}
-                    title={currentVideo.title}
-                    className="w-full h-full absolute inset-0"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                  <div className="absolute bottom-4 left-4 z-10 bg-black/60 rounded-lg px-3 py-1">
-                    <p className="text-white font-semibold text-sm">{currentVideo.title}</p>
-                    <p className="text-gray-200 text-xs">{currentVideo.duration}</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge variant="secondary" className="bg-[#e9ecf1] text-[#22201d]">
-                      {currentVideo.duration}
-                    </Badge>
-                    <div className="flex items-center space-x-2">
-                      <Badge className={`${currentVideo.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' : currentVideo.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                        {currentVideo.difficulty}
-                      </Badge>
-                      {currentVideo.completed && (
-                        <Badge className="bg-green-600 text-white">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Completed
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <h2 className="text-2xl font-bold text-[#22201d] mb-2">
-                    {currentVideo.title}
-                  </h2>
-                  <p className="text-[#22201d] opacity-70 mb-4">{currentVideo.description}</p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex space-x-2">
-                      <Button className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Mark Complete
-                      </Button>
-                      <Button variant="outline" className="border-gray-300 text-[#22201d] hover:bg-[#e9ecf1] rounded-[30px]">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Ask AI
-                      </Button>
-                    </div>
-                    <div className="text-sm text-[#22201d] opacity-70">
-                      Video {selectedVideo + 1} of {tutorials.length}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Progress Card */}
+            {/* Image Generation Demo */}
             <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
               <CardHeader>
-                <CardTitle className="text-lg text-[#22201d]">Your Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#22201d] opacity-70">Image Generation Progress</span>
-                    <span className="font-medium text-[#22201d]">0% complete</span>
-                  </div>
-                  <Progress value={0} className="h-2" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Video List */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg text-[#22201d]">Image Tutorials</CardTitle>
+                <CardTitle className="text-xl text-[#22201d] flex items-center">
+                  <ImageIcon className="h-5 w-5 mr-2 text-[#6cae75]" />
+                  AI Image Generator
+                </CardTitle>
                 <CardDescription className="text-[#22201d] opacity-70">
-                  {tutorials.length} videos in this category
+                  Create stunning images using Stability AI's advanced models
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {tutorials.map((video, index) => (
-                    <div
-                      key={video.id}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                        selectedVideo === index 
-                          ? 'border-[#6cae75] bg-[#6cae75]/10' 
-                          : 'border-gray-200 hover:border-[#6cae75] hover:bg-[#e9ecf1]'
-                      }`}
-                      onClick={() => setSelectedVideo(index)}
+              <CardContent className="space-y-4">
+                <div className="flex space-x-2">
+                  <Textarea
+                    placeholder="Describe your image... (e.g., 'A futuristic city at sunset with flying cars', 'Portrait of a wise old wizard')"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="flex-1 min-h-[100px] text-[#22201d]"
+                    disabled={isLimitReached}
+                  />
+                  <div className="flex flex-col justify-end">
+                    <Button 
+                      onClick={generateImage}
+                      disabled={!prompt.trim() || isGenerating || isLimitReached}
+                      className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          video.completed ? 'bg-[#6cae75]' : 'bg-gray-200'
-                        }`}>
-                          {video.completed ? (
-                            <CheckCircle className="h-4 w-4 text-white" />
-                          ) : (
-                            <PlayCircle className="h-4 w-4 text-[#22201d]" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#22201d] truncate">
-                            {video.title}
-                          </p>
-                          <p className="text-xs text-[#22201d] opacity-70">{video.duration}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      {isGenerating ? "Generating..." : "Generate Image"}
+                    </Button>
+                  </div>
                 </div>
+                
+                {generatedImage && (
+                  <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium text-[#22201d]">Generated Image:</h4>
+                      <Button
+                        onClick={downloadImage}
+                        variant="outline"
+                        size="sm"
+                        className="border-gray-300"
+                      >
+                        <Download className="h-4 w-4 mr-2" />
+                        Download
+                      </Button>
+                    </div>
+                    <img 
+                      src={generatedImage} 
+                      alt="Generated" 
+                      className="w-full h-auto rounded-lg shadow-lg"
+                    />
+                  </div>
+                )}
+
+                {isLimitReached && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm">
+                      You've reached your daily limit of 30 minutes. Upgrade for unlimited access!
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -328,6 +268,55 @@ const Images = () => {
                   </div>
                 </CardContent>
               )}
+            </Card>
+          </div>
+
+          {/* Sidebar with Affiliate Tools */}
+          <div className="space-y-6">
+            <AffiliateCard
+              title="Stability AI"
+              description="Professional AI image generation with SDXL and advanced models."
+              features={[
+                "SDXL & SD3 models",
+                "Commercial usage rights",
+                "API access included",
+                "High-resolution outputs"
+              ]}
+              ctaText="Get API Access"
+              affiliateUrl="https://platform.stability.ai/pricing"
+              commission="Revenue share"
+              rating={4.7}
+              onAffiliateClick={trackAffiliateClick}
+              service="stability"
+            />
+
+            <AffiliateCard
+              title="Midjourney"
+              description="The most popular AI art generator with stunning artistic capabilities."
+              features={[
+                "Best-in-class image quality",
+                "Artistic style variations",
+                "Community features",
+                "Commercial licensing"
+              ]}
+              ctaText="Subscribe Now"
+              affiliateUrl="https://www.midjourney.com/account/"
+              commission="Referral bonus"
+              rating={4.9}
+              onAffiliateClick={trackAffiliateClick}
+              service="midjourney"
+            />
+
+            <Card className="bg-gradient-to-br from-[#6cae75]/10 to-[#5a9d64]/10 border border-[#6cae75]/30 rounded-[20px]">
+              <CardContent className="p-4 text-center">
+                <h3 className="font-semibold text-[#22201d] mb-2">Upgrade for More</h3>
+                <p className="text-sm text-[#22201d] opacity-70 mb-3">
+                  Get unlimited generations and access to premium models.
+                </p>
+                <Button className="w-full bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
+                  Upgrade Now
+                </Button>
+              </CardContent>
             </Card>
           </div>
         </div>
