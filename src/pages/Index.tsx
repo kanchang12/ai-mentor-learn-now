@@ -17,8 +17,8 @@ const Index = () => {
   const categories = [
     {
       id: "general",
-      title: "General AI",
-      description: "Chat with AI, generate content, and get instant answers",
+      title: "AI Tutorials",
+      description: "Master ChatGPT and AI chat tools with comprehensive tutorials",
       icon: MessageSquare,
       color: "from-blue-500/20 to-cyan-500/20",
       borderColor: "border-blue-500/30",
@@ -27,8 +27,8 @@ const Index = () => {
     },
     {
       id: "writing",
-      title: "Writing",
-      description: "Create articles, blogs, and marketing copy with AI",
+      title: "AI Writing Tools",
+      description: "Create professional content with AI writing assistants like Jasper",
       icon: PenTool,
       color: "from-green-500/20 to-emerald-500/20",
       borderColor: "border-green-500/30",
@@ -37,8 +37,8 @@ const Index = () => {
     },
     {
       id: "images",
-      title: "Images",
-      description: "Generate, edit, and enhance images with AI",
+      title: "AI Image Editing",
+      description: "Generate and edit stunning visuals with Midjourney and DALL-E",
       icon: Image,
       color: "from-purple-500/20 to-pink-500/20",
       borderColor: "border-purple-500/30",
@@ -47,8 +47,8 @@ const Index = () => {
     },
     {
       id: "business",
-      title: "Business Automation",
-      description: "Automate workflows and streamline business processes",
+      title: "Business AI Automation",
+      description: "Streamline workflows with intelligent automation tools",
       icon: Briefcase,
       color: "from-orange-500/20 to-red-500/20",
       borderColor: "border-orange-500/30",
@@ -57,8 +57,8 @@ const Index = () => {
     },
     {
       id: "data",
-      title: "Data Analysis",
-      description: "Analyze data, create charts, and extract insights",
+      title: "AI Data Analysis",
+      description: "Extract insights from data using artificial intelligence",
       icon: BarChart3,
       color: "from-indigo-500/20 to-blue-500/20",
       borderColor: "border-indigo-500/30",
@@ -67,8 +67,8 @@ const Index = () => {
     },
     {
       id: "website",
-      title: "Website Builder",
-      description: "Build and deploy websites with AI assistance",
+      title: "AI Website Builder",
+      description: "Build professional websites with AI assistance and tools",
       icon: Globe,
       color: "from-teal-500/20 to-cyan-500/20",
       borderColor: "border-teal-500/30",
@@ -92,7 +92,7 @@ const Index = () => {
               </Link>
               <Link to="/signup">
                 <Button size="sm" className="bg-[#6cae75] hover:bg-[#5a9d64] text-white">
-                  Sign Up
+                  Start Learning AI
                 </Button>
               </Link>
             </div>
@@ -104,10 +104,10 @@ const Index = () => {
         {/* Hero Section with Main Video */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-black text-[#22201d] mb-6">
-            Learn AI Tools That Actually Work
+            Master AI Tutorials, AI Writing & AI Image Editing
           </h1>
-          <p className="text-xl text-[#22201d] opacity-70 mb-12 max-w-3xl mx-auto">
-            Master the most powerful AI tools with step-by-step tutorials and hands-on practice
+          <p className="text-xl text-[#22201d] opacity-70 mb-12 max-w-4xl mx-auto">
+            Learn the most powerful AI tools through step-by-step tutorials. Master ChatGPT, Midjourney, Jasper AI, and more with hands-on practice and expert guidance.
           </p>
           
           {/* Main Hero Video */}
@@ -116,7 +116,7 @@ const Index = () => {
               <div className="aspect-video relative">
                 <iframe
                   src="https://www.youtube.com/embed/QH2-TGUlwu4"
-                  title="How to Use AI - Complete Guide"
+                  title="Complete AI Tutorial Guide - Learn AI Writing and Image Editing"
                   className="w-full h-full"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -124,11 +124,11 @@ const Index = () => {
                 />
               </div>
               <CardContent className="p-6">
-                <h3 className="text-2xl font-bold text-[#22201d] mb-2">
-                  Complete AI Mastery Course
-                </h3>
+                <h2 className="text-2xl font-bold text-[#22201d] mb-2">
+                  Complete AI Mastery Course - 2024 Edition
+                </h2>
                 <p className="text-[#22201d] opacity-70">
-                  Everything you need to know about AI tools in one comprehensive guide
+                  Everything you need to know about AI tutorials, AI writing tools, and AI image editing in one comprehensive guide. Perfect for beginners and advanced users.
                 </p>
               </CardContent>
             </Card>
@@ -138,7 +138,7 @@ const Index = () => {
         {/* Categories Grid */}
         <div className="mb-16">
           <h2 className="text-3xl font-bold text-[#22201d] text-center mb-12">
-            Choose Your AI Journey
+            Choose Your AI Learning Path
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {categories.map((category) => {
@@ -160,7 +160,7 @@ const Index = () => {
                         {category.description}
                       </CardDescription>
                       <Button size="sm" variant="outline" className="w-full">
-                        Start Learning
+                        Start AI Tutorial
                       </Button>
                     </CardContent>
                   </Card>
@@ -170,23 +170,50 @@ const Index = () => {
           </div>
         </div>
 
+        {/* Features Section */}
+        <div className="mb-16">
+          <h2 className="text-3xl font-bold text-[#22201d] text-center mb-12">
+            Why Choose Our AI Tutorials?
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <Card className="bg-white border border-gray-200 rounded-[20px] p-6">
+              <h3 className="text-xl font-bold text-[#22201d] mb-3">Step-by-Step Guidance</h3>
+              <p className="text-[#22201d] opacity-70">
+                Follow along with detailed AI tutorials that break down complex concepts into easy-to-understand steps.
+              </p>
+            </Card>
+            <Card className="bg-white border border-gray-200 rounded-[20px] p-6">
+              <h3 className="text-xl font-bold text-[#22201d] mb-3">Hands-On Practice</h3>
+              <p className="text-[#22201d] opacity-70">
+                Try out AI writing tools and AI image editing software with interactive demos and real examples.
+              </p>
+            </Card>
+            <Card className="bg-white border border-gray-200 rounded-[20px] p-6">
+              <h3 className="text-xl font-bold text-[#22201d] mb-3">Expert Tips & Tricks</h3>
+              <p className="text-[#22201d] opacity-70">
+                Learn insider secrets and advanced techniques from AI professionals and industry experts.
+              </p>
+            </Card>
+          </div>
+        </div>
+
         {/* CTA Section */}
         <div className="text-center bg-gradient-to-br from-[#6cae75]/10 to-[#5a9d64]/10 rounded-[20px] p-12">
           <h2 className="text-3xl font-bold text-[#22201d] mb-4">
-            Ready to Master AI?
+            Ready to Master AI Tools?
           </h2>
           <p className="text-xl text-[#22201d] opacity-70 mb-8">
-            Join thousands learning practical AI skills every day
+            Join thousands learning practical AI skills with our comprehensive tutorials on AI writing, image editing, and automation
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/signup">
               <Button size="lg" className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
-                Start Free Trial
+                Start Free AI Tutorial
               </Button>
             </Link>
             <Link to="/login">
               <Button size="lg" variant="outline" className="rounded-[30px]">
-                Login to Continue
+                Login to Continue Learning
               </Button>
             </Link>
           </div>
