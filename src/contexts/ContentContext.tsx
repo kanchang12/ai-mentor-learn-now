@@ -8,6 +8,17 @@ interface PageContent {
   videoUrl: string;
   videoTitle: string;
   videoDescription: string;
+  heroImage?: string;
+  backgroundImage?: string;
+  logoUrl?: string;
+  ctaButtonText?: string;
+  ctaButtonUrl?: string;
+  socialLinks?: {
+    twitter?: string;
+    youtube?: string;
+    linkedin?: string;
+    facebook?: string;
+  };
 }
 
 interface ContentContextType {
@@ -24,57 +35,134 @@ const defaultContent: Record<string, PageContent> = {
     id: "homepage",
     title: "Master AI Tutorials, AI Writing & AI Image Editing",
     description: "Learn the most powerful AI tools through step-by-step tutorials. Master ChatGPT, Midjourney, Jasper AI, and more with hands-on practice and expert guidance.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
     videoTitle: "Complete AI Mastery Course - 2024 Edition",
-    videoDescription: "Everything you need to know about AI tutorials, AI writing tools, and AI image editing in one comprehensive guide. Perfect for beginners and advanced users."
+    videoDescription: "Everything you need to know about AI tutorials, AI writing tools, and AI image editing in one comprehensive guide. Perfect for beginners and advanced users.",
+    heroImage: "",
+    backgroundImage: "",
+    logoUrl: "",
+    ctaButtonText: "Start Learning",
+    ctaButtonUrl: "/dashboard",
+    socialLinks: {
+      twitter: "",
+      youtube: "",
+      linkedin: "",
+      facebook: ""
+    }
   },
   general: {
     id: "general",
     title: "AI Tutorials - Master ChatGPT and AI Chat Tools",
     description: "Learn how to use ChatGPT and other AI chat tools effectively with step-by-step tutorials and practical examples.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
     videoTitle: "Complete ChatGPT Tutorial - From Beginner to Expert",
-    videoDescription: "Master ChatGPT with this comprehensive tutorial covering prompt engineering, advanced techniques, and real-world applications."
+    videoDescription: "Master ChatGPT with this comprehensive tutorial covering prompt engineering, advanced techniques, and real-world applications.",
+    heroImage: "",
+    backgroundImage: "",
+    logoUrl: "",
+    ctaButtonText: "Start Learning",
+    ctaButtonUrl: "/dashboard",
+    socialLinks: {
+      twitter: "",
+      youtube: "",
+      linkedin: "",
+      facebook: ""
+    }
   },
   writing: {
     id: "writing",
     title: "AI Writing Tools - Master Jasper AI and Content Creation",
     description: "Learn to create professional content using AI writing assistants like Jasper AI, Copy.ai, and more.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
     videoTitle: "AI Writing Mastery - Complete Guide to AI Content Creation",
-    videoDescription: "Learn how to create engaging content, blog posts, and marketing copy using advanced AI writing tools and techniques."
+    videoDescription: "Learn how to create engaging content, blog posts, and marketing copy using advanced AI writing tools and techniques.",
+    heroImage: "",
+    backgroundImage: "",
+    logoUrl: "",
+    ctaButtonText: "Start Learning",
+    ctaButtonUrl: "/dashboard",
+    socialLinks: {
+      twitter: "",
+      youtube: "",
+      linkedin: "",
+      facebook: ""
+    }
   },
   images: {
     id: "images",
     title: "AI Image Editing - Master Midjourney and DALL-E",
     description: "Create stunning visuals with AI image generation and editing tools including Midjourney, DALL-E, and Stable Diffusion.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
     videoTitle: "AI Image Generation Masterclass - Midjourney & DALL-E Guide",
-    videoDescription: "Complete guide to AI image generation covering Midjourney, DALL-E, prompt engineering, and advanced techniques for creating professional visuals."
+    videoDescription: "Complete guide to AI image generation covering Midjourney, DALL-E, prompt engineering, and advanced techniques for creating professional visuals.",
+    heroImage: "",
+    backgroundImage: "",
+    logoUrl: "",
+    ctaButtonText: "Start Learning",
+    ctaButtonUrl: "/dashboard",
+    socialLinks: {
+      twitter: "",
+      youtube: "",
+      linkedin: "",
+      facebook: ""
+    }
   },
   business: {
     id: "business",
     title: "Business AI Automation - Streamline Your Workflow",
     description: "Automate your business processes with AI tools and increase productivity with intelligent automation solutions.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
     videoTitle: "Business AI Automation Complete Guide",
-    videoDescription: "Learn how to implement AI automation in your business, streamline workflows, and boost productivity with the latest AI tools."
+    videoDescription: "Learn how to implement AI automation in your business, streamline workflows, and boost productivity with the latest AI tools.",
+    heroImage: "",
+    backgroundImage: "",
+    logoUrl: "",
+    ctaButtonText: "Start Learning",
+    ctaButtonUrl: "/dashboard",
+    socialLinks: {
+      twitter: "",
+      youtube: "",
+      linkedin: "",
+      facebook: ""
+    }
   },
   data: {
     id: "data",
     title: "AI Data Analysis - Extract Insights with Artificial Intelligence",
     description: "Learn to analyze data and extract valuable insights using AI-powered analytics tools and machine learning techniques.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
     videoTitle: "AI Data Analysis Mastery Course",
-    videoDescription: "Master data analysis with AI tools, learn machine learning basics, and discover how to extract actionable insights from your data."
+    videoDescription: "Master data analysis with AI tools, learn machine learning basics, and discover how to extract actionable insights from your data.",
+    heroImage: "",
+    backgroundImage: "",
+    logoUrl: "",
+    ctaButtonText: "Start Learning",
+    ctaButtonUrl: "/dashboard",
+    socialLinks: {
+      twitter: "",
+      youtube: "",
+      linkedin: "",
+      facebook: ""
+    }
   },
   website: {
     id: "website",
     title: "AI Website Builder - Create Professional Sites with AI",
     description: "Build professional websites using AI-powered tools and platforms that automate design and development processes.",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+    videoUrl: "https://www.youtube.com/embed/A0HHinUgdn4",
     videoTitle: "AI Website Building Complete Tutorial",
-    videoDescription: "Learn to build professional websites using AI tools, from design to deployment, with practical examples and best practices."
+    videoDescription: "Learn to build professional websites using AI tools, from design to deployment, with practical examples and best practices.",
+    heroImage: "",
+    backgroundImage: "",
+    logoUrl: "",
+    ctaButtonText: "Start Learning",
+    ctaButtonUrl: "/dashboard",
+    socialLinks: {
+      twitter: "",
+      youtube: "",
+      linkedin: "",
+      facebook: ""
+    }
   }
 };
 
