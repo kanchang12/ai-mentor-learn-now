@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,6 +21,14 @@ const TestResults = () => {
     {
       name: "Homepage loads correctly",
       test: async (): Promise<string> => {
+        // Navigate to homepage first
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/') {
+          window.history.pushState({}, '', '/');
+          // Wait for page to render
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
         // Check if we're on the homepage by looking for expected elements
         const title = document.querySelector('h1');
         const categoryCards = document.querySelectorAll('a[href="/general"], a[href="/writing"], a[href="/images"], a[href="/business"], a[href="/data"], a[href="/website"]');
@@ -38,6 +47,13 @@ const TestResults = () => {
     {
       name: "Navigation links functional",
       test: async (): Promise<string> => {
+        // Ensure we're on homepage
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/') {
+          window.history.pushState({}, '', '/');
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+        
         const links = [
           { href: "/general", name: "General" },
           { href: "/writing", name: "Writing" },
