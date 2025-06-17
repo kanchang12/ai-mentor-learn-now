@@ -3,8 +3,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowLeft, CreditCard, Download } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const Billing = () => {
+  const { toast } = useToast();
+
+  const handleUpgradeToPro = () => {
+    toast({
+      title: "Payment Processing",
+      description: "Redirecting to secure payment...",
+    });
+    // Open payment in new tab
+    window.open('https://buy.stripe.com/test_payment_link', '_blank');
+  };
+
+  const handleContactSales = () => {
+    toast({
+      title: "Contact Sales",
+      description: "Redirecting to contact form...",
+    });
+    // You can replace this with actual contact form or email
+    window.open('mailto:sales@howtouseai.com?subject=Enterprise Plan Inquiry', '_blank');
+  };
+
+  const handleAddPaymentMethod = () => {
+    toast({
+      title: "Payment Method",
+      description: "Redirecting to payment setup...",
+    });
+    // Open payment method setup
+    window.open('https://billing.stripe.com/p/login/test_setup', '_blank');
+  };
+
   return (
     <div className="min-h-screen bg-[#fef9ed]">
       {/* Header */}
@@ -89,7 +119,10 @@ const Billing = () => {
                     <span className="text-[#22201d] opacity-80">Downloadable resources</span>
                   </div>
                 </div>
-                <Button className="w-full mt-6 bg-[#6cae75] hover:bg-[#5a9d64] text-white font-bold py-3 rounded-[30px]">
+                <Button 
+                  onClick={handleUpgradeToPro}
+                  className="w-full mt-6 bg-[#6cae75] hover:bg-[#5a9d64] text-white font-bold py-3 rounded-[30px]"
+                >
                   <CreditCard className="h-4 w-4 mr-2" />
                   Upgrade to Pro
                 </Button>
@@ -132,7 +165,11 @@ const Billing = () => {
                     <span className="text-[#22201d] opacity-80">SSO integration</span>
                   </div>
                 </div>
-                <Button className="w-full mt-6 bg-gray-200 hover:bg-gray-300 text-[#22201d] font-bold py-3 rounded-[30px]" variant="outline">
+                <Button 
+                  onClick={handleContactSales}
+                  className="w-full mt-6 bg-gray-200 hover:bg-gray-300 text-[#22201d] font-bold py-3 rounded-[30px]" 
+                  variant="outline"
+                >
                   Contact Sales
                 </Button>
               </CardContent>
@@ -162,7 +199,10 @@ const Billing = () => {
                 <CreditCard className="h-16 w-16 text-[#22201d] opacity-30 mx-auto mb-4" />
                 <p className="text-[#22201d] opacity-50 text-lg">No payment method on file</p>
                 <p className="text-[#22201d] opacity-40 text-sm mt-2">Add a payment method to upgrade your plan</p>
-                <Button className="mt-4 bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
+                <Button 
+                  onClick={handleAddPaymentMethod}
+                  className="mt-4 bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]"
+                >
                   Add Payment Method
                 </Button>
               </div>
