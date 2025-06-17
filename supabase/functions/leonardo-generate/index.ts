@@ -13,17 +13,22 @@ serve(async (req) => {
 
   try {
     const { prompt } = await req.json()
+    
+    // Check for API key in Supabase secrets
     const apiKey = Deno.env.get('LEONARDO_API_KEY')
 
     if (!apiKey) {
+      console.error('LEONARDO_API_KEY not found in Supabase secrets')
       return new Response(
         JSON.stringify({ 
-          response: "Leonardo AI API key not configured. Admin needs to set the LEONARDO_API_KEY in Supabase secrets.",
-          imageUrl: "https://via.placeholder.com/512x512?text=Leonardo+AI+Demo"
+          response: "Leonardo AI API key not configured in Supabase secrets. Please add LEONARDO_API_KEY to your Supabase Edge Function Secrets.",
+          error: "API_KEY_MISSING"
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       )
     }
+
+    console.log('Making request to Leonardo AI API...')
 
     const response = await fetch('https://cloud.leonardo.ai/api/rest/v1/generations', {
       method: 'POST',
@@ -42,25 +47,28 @@ serve(async (req) => {
       }),
     })
 
-    const data = await response.json()
-    
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Leonardo AI API error')
+      const errorText = await response.text()
+      console.error('Leonardo AI API error:', response.status, errorText)
+      throw new Error(`Leonardo AI API error: ${response.status} - ${errorText}`)
     }
 
+    const data = await response.json()
+    console.log('Leonardo AI API response received successfully')
+    
     return new Response(
       JSON.stringify({ 
-        response: "Image generated successfully with Leonardo AI",
+        response: "Image generation started successfully with Leonardo AI",
         generationId: data.sdGenerationJob.generationId
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in leonardo-generate function:', error)
     return new Response(
       JSON.stringify({ 
-        response: `Leonardo AI Demo: Would generate image for "${prompt}" when API key is configured`,
-        imageUrl: "https://via.placeholder.com/512x512?text=Leonardo+AI+Demo"
+        response: `Error: ${error.message}`,
+        error: "FUNCTION_ERROR"
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )

@@ -13,16 +13,22 @@ serve(async (req) => {
 
   try {
     const { prompt } = await req.json()
+    
+    // Check for API key in Supabase secrets
     const apiKey = Deno.env.get('CLAUDE_API_KEY')
 
     if (!apiKey) {
+      console.error('CLAUDE_API_KEY not found in Supabase secrets')
       return new Response(
         JSON.stringify({ 
-          response: "Claude API key not configured. Admin needs to set the CLAUDE_API_KEY in Supabase secrets." 
+          response: "Claude API key not configured in Supabase secrets. Please add CLAUDE_API_KEY to your Supabase Edge Function Secrets.",
+          error: "API_KEY_MISSING"
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
       )
     }
+
+    console.log('Making request to Claude API...')
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -43,20 +49,26 @@ serve(async (req) => {
       }),
     })
 
-    const data = await response.json()
-    
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Claude API error')
+      const errorText = await response.text()
+      console.error('Claude API error:', response.status, errorText)
+      throw new Error(`Claude API error: ${response.status} - ${errorText}`)
     }
 
+    const data = await response.json()
+    console.log('Claude API response received successfully')
+    
     return new Response(
       JSON.stringify({ response: data.content[0].text }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error in claude-analyze function:', error)
     return new Response(
-      JSON.stringify({ response: `Error: ${error.message}` }),
+      JSON.stringify({ 
+        response: `Error: ${error.message}`,
+        error: "FUNCTION_ERROR"
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
     )
   }
