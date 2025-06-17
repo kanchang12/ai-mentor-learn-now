@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare } from "lucide-react";
@@ -12,7 +12,6 @@ const General = () => {
   const [prompt, setPrompt] = useState("");
   const [response, setResponse] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [apiKey, setApiKey] = useState("");
   const { trackAffiliateClick } = useUsageTracking('general');
   const { toast } = useToast();
 
@@ -26,10 +25,11 @@ const General = () => {
       return;
     }
 
-    if (!apiKey.trim()) {
+    const apiKey = localStorage.getItem('api_key_perplexity');
+    if (!apiKey) {
       toast({
         title: "Error", 
-        description: "Please enter your Perplexity API key",
+        description: "Perplexity API key not configured. Please contact admin.",
         variant: "destructive",
       });
       return;
@@ -77,7 +77,7 @@ const General = () => {
       console.error('Error calling Perplexity API:', error);
       toast({
         title: "Error",
-        description: "Failed to get AI response. Please check your API key.",
+        description: "Failed to get AI response. Please check API configuration.",
         variant: "destructive",
       });
     } finally {
@@ -87,16 +87,6 @@ const General = () => {
 
   const demoContent = (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Perplexity API Key</label>
-        <Textarea
-          placeholder="Enter your Perplexity API key..."
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          className="min-h-[60px] text-[#22201d]"
-        />
-      </div>
-      
       <Textarea
         placeholder="Ask AI anything... (e.g., 'Write a professional email', 'Explain quantum computing', 'Help me plan a vacation')"
         value={prompt}
@@ -105,7 +95,7 @@ const General = () => {
       />
       <Button 
         onClick={handleSubmit}
-        disabled={!prompt.trim() || !apiKey.trim() || isLoading}
+        disabled={!prompt.trim() || isLoading}
         className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
       >
         {isLoading ? "AI is thinking..." : "Ask AI"}

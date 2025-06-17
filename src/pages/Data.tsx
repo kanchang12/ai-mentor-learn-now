@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { BarChart3 } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { AffiliateCard } from "@/components/AffiliateCard";
@@ -11,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 
 const Data = () => {
   const [dataQuery, setDataQuery] = useState("");
-  const [apiKey, setApiKey] = useState("");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResult, setAnalysisResult] = useState("");
   const { trackAffiliateClick } = useUsageTracking('data');
@@ -27,10 +25,11 @@ const Data = () => {
       return;
     }
 
-    if (!apiKey.trim()) {
+    const apiKey = localStorage.getItem('api_key_claude');
+    if (!apiKey) {
       toast({
         title: "Error",
-        description: "Please enter your Claude API key",
+        description: "Claude API key not configured. Please contact admin.",
         variant: "destructive",
       });
       return;
@@ -69,7 +68,7 @@ const Data = () => {
       console.error('Error calling Claude API:', error);
       toast({
         title: "Error",
-        description: "Failed to analyze data. Please check your API key.",
+        description: "Failed to analyze data. Please check API configuration.",
         variant: "destructive",
       });
     } finally {
@@ -79,17 +78,6 @@ const Data = () => {
 
   const demoContent = (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Claude API Key</label>
-        <Input
-          placeholder="Enter your Anthropic Claude API key..."
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          className="text-[#22201d]"
-          type="password"
-        />
-      </div>
-      
       <Textarea
         placeholder="Describe your data analysis request... (e.g., 'Analyze sales trends', 'Find patterns in customer data', 'Statistical analysis of survey results')"
         value={dataQuery}
@@ -99,7 +87,7 @@ const Data = () => {
       
       <Button 
         onClick={analyzeData}
-        disabled={!dataQuery.trim() || !apiKey.trim() || isAnalyzing}
+        disabled={!dataQuery.trim() || isAnalyzing}
         className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
       >
         {isAnalyzing ? "Analyzing..." : "Analyze with Claude"}

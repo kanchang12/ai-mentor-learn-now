@@ -52,9 +52,12 @@ const Admin = () => {
   });
   const [loading, setLoading] = useState(true);
   const [apiKeys, setApiKeys] = useState({
-    openai: '',
-    replicate: '',
-    stability: ''
+    perplexity: '',
+    jasper: '',
+    leonardo: '',
+    claude: '',
+    wix: '',
+    makecom: ''
   });
   const [activeTab, setActiveTab] = useState("content");
   const { toast } = useToast();
@@ -228,12 +231,22 @@ const Admin = () => {
       return;
     }
 
-    console.log(`Updating ${service} API key...`);
-    
-    toast({
-      title: "Success",
-      description: `${service} API key updated successfully. In production, this would be stored securely via Supabase Edge Functions.`,
-    });
+    try {
+      // Store the API key in localStorage for now (in production, this would be in Supabase secrets)
+      localStorage.setItem(`api_key_${service.toLowerCase()}`, key);
+      
+      toast({
+        title: "Success",
+        description: `${service} API key updated successfully.`,
+      });
+    } catch (error) {
+      console.error(`Error updating ${service} API key:`, error);
+      toast({
+        title: "Error",
+        description: `Failed to update ${service} API key.`,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleQuickAction = (action: string) => {
@@ -296,7 +309,7 @@ const Admin = () => {
             <CardContent className="p-4 text-center">
               <Key className="h-8 w-8 text-green-600 mx-auto mb-2" />
               <h3 className="font-semibold text-[#22201d]">API Keys</h3>
-              <p className="text-sm text-[#22201d] opacity-70">Manage secure API keys</p>
+              <p className="text-sm text-[#22201d] opacity-70">Manage all API keys</p>
             </CardContent>
           </Card>
 
@@ -401,35 +414,34 @@ const Admin = () => {
             <Card>
               <CardHeader>
                 <CardTitle>API Keys Management</CardTitle>
-                <CardDescription>Securely manage API keys for AI services</CardDescription>
+                <CardDescription>Manage API keys for all AI services</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
                   <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                    <h3 className="font-semibold text-blue-900 mb-2">Security Note</h3>
+                    <h3 className="font-semibold text-blue-900 mb-2">API Keys Setup</h3>
                     <p className="text-sm text-blue-800">
-                      API keys are stored securely in Supabase Edge Function secrets. 
-                      They are never exposed in the frontend code.
+                      Configure API keys for each service. These will be used across all pages automatically.
                     </p>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Card>
                       <CardContent className="p-6">
-                        <h4 className="font-medium mb-4">OpenAI API Key</h4>
+                        <h4 className="font-medium mb-4">Perplexity AI (General Chat)</h4>
                         <div className="space-y-3">
                           <Input
                             type="password"
-                            placeholder="sk-..."
-                            value={apiKeys.openai}
-                            onChange={(e) => setApiKeys(prev => ({ ...prev, openai: e.target.value }))}
+                            placeholder="Enter Perplexity API key..."
+                            value={apiKeys.perplexity}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, perplexity: e.target.value }))}
                           />
                           <Button 
                             size="sm" 
-                            onClick={() => updateApiKey('OpenAI', apiKeys.openai)}
+                            onClick={() => updateApiKey('Perplexity', apiKeys.perplexity)}
                             className="w-full"
                           >
-                            Update OpenAI Key
+                            Update Perplexity Key
                           </Button>
                         </div>
                       </CardContent>
@@ -437,20 +449,20 @@ const Admin = () => {
                     
                     <Card>
                       <CardContent className="p-6">
-                        <h4 className="font-medium mb-4">Replicate API Key</h4>
+                        <h4 className="font-medium mb-4">Leonardo AI (Images)</h4>
                         <div className="space-y-3">
                           <Input
                             type="password"
-                            placeholder="r8_..."
-                            value={apiKeys.replicate}
-                            onChange={(e) => setApiKeys(prev => ({ ...prev, replicate: e.target.value }))}
+                            placeholder="Enter Leonardo AI API key..."
+                            value={apiKeys.leonardo}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, leonardo: e.target.value }))}
                           />
                           <Button 
                             size="sm" 
-                            onClick={() => updateApiKey('Replicate', apiKeys.replicate)}
+                            onClick={() => updateApiKey('Leonardo', apiKeys.leonardo)}
                             className="w-full"
                           >
-                            Update Replicate Key
+                            Update Leonardo Key
                           </Button>
                         </div>
                       </CardContent>
@@ -458,20 +470,83 @@ const Admin = () => {
 
                     <Card>
                       <CardContent className="p-6">
-                        <h4 className="font-medium mb-4">Stability AI Key</h4>
+                        <h4 className="font-medium mb-4">Claude AI (Data Analysis)</h4>
                         <div className="space-y-3">
                           <Input
                             type="password"
-                            placeholder="sk-..."
-                            value={apiKeys.stability}
-                            onChange={(e) => setApiKeys(prev => ({ ...prev, stability: e.target.value }))}
+                            placeholder="Enter Claude API key..."
+                            value={apiKeys.claude}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, claude: e.target.value }))}
                           />
                           <Button 
                             size="sm" 
-                            onClick={() => updateApiKey('Stability AI', apiKeys.stability)}
+                            onClick={() => updateApiKey('Claude', apiKeys.claude)}
                             className="w-full"
                           >
-                            Update Stability Key
+                            Update Claude Key
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-6">
+                        <h4 className="font-medium mb-4">Jasper AI (Writing)</h4>
+                        <div className="space-y-3">
+                          <Input
+                            type="password"
+                            placeholder="Enter Jasper API key..."
+                            value={apiKeys.jasper}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, jasper: e.target.value }))}
+                          />
+                          <Button 
+                            size="sm" 
+                            onClick={() => updateApiKey('Jasper', apiKeys.jasper)}
+                            className="w-full"
+                          >
+                            Update Jasper Key
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-6">
+                        <h4 className="font-medium mb-4">Make.com (Business Automation)</h4>
+                        <div className="space-y-3">
+                          <Input
+                            type="password"
+                            placeholder="Enter Make.com webhook URL..."
+                            value={apiKeys.makecom}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, makecom: e.target.value }))}
+                          />
+                          <Button 
+                            size="sm" 
+                            onClick={() => updateApiKey('MakeCom', apiKeys.makecom)}
+                            className="w-full"
+                          >
+                            Update Make.com URL
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    <Card>
+                      <CardContent className="p-6">
+                        <h4 className="font-medium mb-4">Wix (Website Building)</h4>
+                        <div className="space-y-3">
+                          <Input
+                            type="password"
+                            placeholder="Enter Wix API key (optional)..."
+                            value={apiKeys.wix}
+                            onChange={(e) => setApiKeys(prev => ({ ...prev, wix: e.target.value }))}
+                          />
+                          <Button 
+                            size="sm" 
+                            onClick={() => updateApiKey('Wix', apiKeys.wix)}
+                            className="w-full"
+                          >
+                            Update Wix Key
                           </Button>
                         </div>
                       </CardContent>

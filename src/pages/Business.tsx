@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Briefcase } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
@@ -10,7 +9,6 @@ import { useUsageTracking } from "@/hooks/useUsageTracking";
 import { useToast } from "@/hooks/use-toast";
 
 const Business = () => {
-  const [webhookUrl, setWebhookUrl] = useState("");
   const [automationData, setAutomationData] = useState("");
   const [isTriggering, setIsTriggering] = useState(false);
   const [response, setResponse] = useState("");
@@ -18,10 +16,11 @@ const Business = () => {
   const { toast } = useToast();
 
   const triggerAutomation = async () => {
-    if (!webhookUrl.trim()) {
+    const webhookUrl = localStorage.getItem('api_key_makecom');
+    if (!webhookUrl) {
       toast({
         title: "Error",
-        description: "Please enter your Make.com webhook URL",
+        description: "Make.com webhook URL not configured. Please contact admin.",
         variant: "destructive",
       });
       return;
@@ -53,7 +52,7 @@ const Business = () => {
       });
     } catch (error) {
       console.error('Error triggering Make.com automation:', error);
-      setResponse("Error triggering automation. Please check your webhook URL.");
+      setResponse("Error triggering automation. Please check configuration.");
       toast({
         title: "Error",
         description: "Failed to trigger automation",
@@ -67,17 +66,6 @@ const Business = () => {
   const demoContent = (
     <div className="space-y-4">
       <div className="space-y-2">
-        <label className="text-sm font-medium">Make.com Webhook URL</label>
-        <Input
-          placeholder="https://hook.make.com/..."
-          value={webhookUrl}
-          onChange={(e) => setWebhookUrl(e.target.value)}
-          className="text-[#22201d]"
-        />
-        <p className="text-xs text-gray-600">Create a webhook trigger in Make.com and paste the URL here</p>
-      </div>
-      
-      <div className="space-y-2">
         <label className="text-sm font-medium">Automation Data (Optional)</label>
         <Textarea
           placeholder="Enter any data to send with the automation trigger..."
@@ -89,7 +77,7 @@ const Business = () => {
       
       <Button 
         onClick={triggerAutomation}
-        disabled={!webhookUrl.trim() || isTriggering}
+        disabled={isTriggering}
         className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
       >
         {isTriggering ? "Triggering..." : "Trigger Automation"}

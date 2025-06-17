@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Image as ImageIcon } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { AffiliateCard } from "@/components/AffiliateCard";
@@ -11,7 +10,6 @@ import { useToast } from "@/hooks/use-toast";
 
 const Images = () => {
   const [prompt, setPrompt] = useState("");
-  const [apiKey, setApiKey] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
   const { trackAffiliateClick } = useUsageTracking('images');
@@ -27,10 +25,11 @@ const Images = () => {
       return;
     }
 
-    if (!apiKey.trim()) {
+    const apiKey = localStorage.getItem('api_key_leonardo');
+    if (!apiKey) {
       toast({
         title: "Error",
-        description: "Please enter your Leonardo AI API key",
+        description: "Leonardo AI API key not configured. Please contact admin.",
         variant: "destructive",
       });
       return;
@@ -98,7 +97,7 @@ const Images = () => {
       console.error('Error generating image:', error);
       toast({
         title: "Error",
-        description: "Failed to generate image. Please check your API key.",
+        description: "Failed to generate image. Please check API configuration.",
         variant: "destructive",
       });
     } finally {
@@ -108,17 +107,6 @@ const Images = () => {
 
   const demoContent = (
     <div className="space-y-4">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Leonardo AI API Key</label>
-        <Input
-          placeholder="Enter your Leonardo AI API key..."
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          className="text-[#22201d]"
-          type="password"
-        />
-      </div>
-      
       <Textarea
         placeholder="Describe your image... (e.g., 'A futuristic city at sunset', 'Portrait of a wise wizard', 'Abstract art with vibrant colors')"
         value={prompt}
@@ -128,7 +116,7 @@ const Images = () => {
       
       <Button 
         onClick={generateImage}
-        disabled={!prompt.trim() || !apiKey.trim() || isGenerating}
+        disabled={!prompt.trim() || isGenerating}
         className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
       >
         {isGenerating ? "Generating..." : "Generate Image"}
