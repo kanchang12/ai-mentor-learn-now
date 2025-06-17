@@ -29,47 +29,54 @@ interface ContentContextType {
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
 
 const defaultContent: Record<string, PageContent> = {
+  homepage: {
+    title: "Master AI Tools with Expert Tutorials",
+    description: "Learn how to use Perplexity AI, Leonardo AI, Jasper AI and more with step-by-step video tutorials and hands-on practice",
+    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoTitle: "How to Use AI Tools - Complete Beginner's Guide",
+    videoDescription: "Get started with the most powerful AI tools including Perplexity for research, Leonardo for images, and Jasper for writing"
+  },
   general: {
-    title: "General AI Assistant",
-    description: "Master ChatGPT, Claude, and Perplexity for everyday AI tasks",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    videoTitle: "Getting Started with AI Chat - Complete Guide",
-    videoDescription: "Learn how to effectively use Perplexity, ChatGPT and Claude for maximum productivity"
+    title: "Perplexity AI Chat Assistant",
+    description: "Master Perplexity AI for real-time research and intelligent conversations with web-connected AI",
+    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoTitle: "Perplexity AI Complete Tutorial - Research Like a Pro",
+    videoDescription: "Learn how to use Perplexity AI for advanced research, fact-checking, and getting up-to-date information with citations"
   },
   writing: {
-    title: "AI Writing Assistant", 
-    description: "Create professional content with Perplexity AI and advanced writing tools",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    videoTitle: "AI Writing Mastery with Perplexity",
-    videoDescription: "Master content creation using AI writing tools and advanced prompting techniques"
+    title: "Jasper AI Writing Assistant", 
+    description: "Create professional content with Jasper AI and advanced writing tools for blogs, emails, and marketing copy",
+    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoTitle: "Jasper AI Writing Mastery - From Beginner to Pro",
+    videoDescription: "Master content creation using Jasper AI's powerful writing assistant and advanced prompting techniques"
   },
   images: {
-    title: "AI Image Generator",
-    description: "Generate stunning visuals with Leonardo AI and advanced image models",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", 
+    title: "Leonardo AI Image Generator",
+    description: "Generate stunning visuals with Leonardo AI's professional image generation and editing tools",
+    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd", 
     videoTitle: "Leonardo AI Image Generation Masterclass",
-    videoDescription: "Learn to create professional images using Leonardo AI and advanced prompting"
+    videoDescription: "Learn to create professional images using Leonardo AI's advanced models and prompting strategies"
   },
   music: {
     title: "AI Music Generator",
-    description: "Create AI-generated music and soundtracks",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    videoTitle: "AI Music Generation with Mubert", 
-    videoDescription: "Learn to create professional music with AI tools"
+    description: "Create AI-generated music and soundtracks with professional tools",
+    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoTitle: "AI Music Generation Complete Guide", 
+    videoDescription: "Learn to create professional music tracks using AI-powered composition tools"
   },
   data: {
-    title: "AI Data Analysis",
-    description: "Analyze data and extract insights with Claude AI and advanced analytics", 
+    title: "AI Data Analysis with Jupyter",
+    description: "Analyze data and extract insights using Jupyter AI and advanced analytics tools", 
     videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
     videoTitle: "Data Science with AI - Complete Tutorial",
-    videoDescription: "Transform your data into actionable insights using Claude AI and advanced analysis techniques"
+    videoDescription: "Transform your data into actionable insights using Jupyter AI and advanced analysis techniques"
   },
   website: {
     title: "AI Website Builder",
-    description: "Build websites with AI assistance",
-    videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
-    videoTitle: "Building Websites with AI", 
-    videoDescription: "Create professional websites using AI tools"
+    description: "Build professional websites with AI assistance and modern development tools",
+    videoUrl: "https://www.youtube.com/embed/2yXZ5UOYfmM?si=8lQdo-6Hl95nLErd",
+    videoTitle: "Building Websites with AI - Complete Course", 
+    videoDescription: "Create professional websites using AI-powered design and development tools"
   }
 };
 
