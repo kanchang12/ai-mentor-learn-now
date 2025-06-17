@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,7 @@ const TestResults = () => {
   const testCases = [
     {
       name: "Homepage loads correctly",
-      test: async () => {
+      test: async (): Promise<string> => {
         // Check if title and main elements exist
         const title = document.querySelector('h1');
         const categories = document.querySelectorAll('[href="/general"], [href="/writing"], [href="/images"], [href="/business"], [href="/data"], [href="/website"]');
@@ -33,7 +32,7 @@ const TestResults = () => {
     },
     {
       name: "Navigation links functional",
-      test: async () => {
+      test: async (): Promise<string> => {
         const links = [
           { href: "/general", name: "General" },
           { href: "/writing", name: "Writing" },
@@ -56,7 +55,7 @@ const TestResults = () => {
     },
     {
       name: "External links accessibility",
-      test: async () => {
+      test: async (): Promise<string> => {
         const externalUrls = [
           "https://gemnink-data-dashboard1-451954006366.europe-west1.run.app",
           "https://claude.ai/upgrade",
@@ -88,7 +87,7 @@ const TestResults = () => {
     },
     {
       name: "PayPal script loading",
-      test: async () => {
+      test: async (): Promise<string> => {
         return new Promise((resolve, reject) => {
           const existingScript = document.querySelector('script[src*="paypal.com/sdk"]');
           if (existingScript) {
@@ -120,7 +119,7 @@ const TestResults = () => {
     },
     {
       name: "Local Storage functionality",
-      test: async () => {
+      test: async (): Promise<string> => {
         const testKey = 'test_key_' + Date.now();
         const testValue = 'test_value_123';
         
@@ -135,13 +134,13 @@ const TestResults = () => {
           
           return "Local storage working correctly";
         } catch (error) {
-          throw new Error(`Local storage error: ${error.message}`);
+          throw new Error(`Local storage error: ${(error as Error).message}`);
         }
       }
     },
     {
       name: "Data dashboard iframe accessibility",
-      test: async () => {
+      test: async (): Promise<string> => {
         const dashboardUrl = "https://gemnink-data-dashboard1-451954006366.europe-west1.run.app";
         
         try {
@@ -151,7 +150,7 @@ const TestResults = () => {
           iframe.style.display = 'none';
           document.body.appendChild(iframe);
           
-          return new Promise((resolve, reject) => {
+          return new Promise<string>((resolve, reject) => {
             iframe.onload = () => {
               document.body.removeChild(iframe);
               resolve("Data dashboard loads successfully");
@@ -170,7 +169,7 @@ const TestResults = () => {
             }, 15000);
           });
         } catch (error) {
-          throw new Error(`Dashboard test error: ${error.message}`);
+          throw new Error(`Dashboard test error: ${(error as Error).message}`);
         }
       }
     }
@@ -217,7 +216,7 @@ const TestResults = () => {
             ? { 
                 ...test, 
                 status: 'fail' as const, 
-                message: error.message,
+                message: (error as Error).message,
                 duration 
               }
             : test
