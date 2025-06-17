@@ -8,12 +8,15 @@ import {
   Briefcase, 
   BarChart3, 
   Globe,
-  ArrowRight,
-  Play
+  ArrowRight
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useContent } from "@/contexts/ContentContext";
 
 const Index = () => {
+  const { getPageContent } = useContent();
+  const homepageContent = getPageContent("homepage");
+
   const categories = [
     {
       id: "general",
@@ -104,10 +107,10 @@ const Index = () => {
         {/* Hero Section with Main Video */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-black text-[#22201d] mb-6">
-            Master AI Tutorials, AI Writing & AI Image Editing
+            {homepageContent.title}
           </h1>
           <p className="text-xl text-[#22201d] opacity-70 mb-12 max-w-4xl mx-auto">
-            Learn the most powerful AI tools through step-by-step tutorials. Master ChatGPT, Midjourney, Jasper AI, and more with hands-on practice and expert guidance.
+            {homepageContent.description}
           </p>
           
           {/* Main Hero Video */}
@@ -115,8 +118,8 @@ const Index = () => {
             <Card className="bg-white border border-gray-200 rounded-[20px] overflow-hidden shadow-lg">
               <div className="aspect-video relative">
                 <iframe
-                  src="https://www.youtube.com/embed/QH2-TGUlwu4"
-                  title="Complete AI Tutorial Guide - Learn AI Writing and Image Editing"
+                  src={homepageContent.videoUrl}
+                  title={homepageContent.videoTitle}
                   className="w-full h-full"
                   frameBorder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -125,10 +128,10 @@ const Index = () => {
               </div>
               <CardContent className="p-6">
                 <h2 className="text-2xl font-bold text-[#22201d] mb-2">
-                  Complete AI Mastery Course - 2024 Edition
+                  {homepageContent.videoTitle}
                 </h2>
                 <p className="text-[#22201d] opacity-70">
-                  Everything you need to know about AI tutorials, AI writing tools, and AI image editing in one comprehensive guide. Perfect for beginners and advanced users.
+                  {homepageContent.videoDescription}
                 </p>
               </CardContent>
             </Card>
