@@ -9,11 +9,11 @@ const Billing = () => {
 
   const handleUpgradeToPro = () => {
     toast({
-      title: "Redirecting to PayPal",
-      description: "Opening secure payment gateway...",
+      title: "Payment Setup Required",
+      description: "Please contact support to set up your Pro subscription payment.",
     });
-    // Replace with your actual PayPal payment link
-    window.open('https://www.paypal.com/paypalme/yourusername/19', '_blank');
+    // You need to replace this with your actual payment processor setup
+    window.open('mailto:support@howtouseai.com?subject=Pro Plan Upgrade Request', '_blank');
   };
 
   const handleContactSales = () => {
@@ -27,10 +27,9 @@ const Billing = () => {
   const handleAddPaymentMethod = () => {
     toast({
       title: "Payment Setup",
-      description: "Opening PayPal payment setup...",
+      description: "Contact support to add payment method.",
     });
-    // Replace with your PayPal payment method setup link
-    window.open('https://www.paypal.com/signin', '_blank');
+    window.open('mailto:support@howtouseai.com?subject=Add Payment Method', '_blank');
   };
 
   return (
