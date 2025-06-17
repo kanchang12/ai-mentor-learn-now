@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -36,6 +35,7 @@ const Login = () => {
           title: "Success",
           description: "Signed in successfully!",
         });
+        // Redirect to dashboard after successful login
         navigate("/dashboard");
       }
     } catch (error) {

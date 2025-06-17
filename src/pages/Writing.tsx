@@ -9,10 +9,13 @@ import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { AffiliateCard } from "@/components/AffiliateCard";
 import { useUsageTracking } from "@/hooks/useUsageTracking";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Writing = () => {
   const [contentType, setContentType] = useState("");
   const [topic, setTopic] = useState("");
+  const [tone, setTone] = useState("");
+  const [length, setLength] = useState("");
   const [generatedContent, setGeneratedContent] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const { trackAffiliateClick } = useUsageTracking('writing');
@@ -31,14 +34,35 @@ const Writing = () => {
     setIsGenerating(true);
     setGeneratedContent("");
     
-    // Redirect to Jasper AI for content generation
-    const jasperUrl = `https://www.jasper.ai/templates/${contentType}?topic=${encodeURIComponent(topic)}`;
-    window.open(jasperUrl, '_blank');
-    
-    setTimeout(() => {
-      setGeneratedContent(`Content generation has been opened in Jasper AI. Please complete your ${contentType} about "${topic}" in the new tab and copy the result back here if needed.`);
+    try {
+      const { data, error } = await supabase.functions.invoke('perplexity-writing', {
+        body: {
+          contentType,
+          topic,
+          tone,
+          length
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setGeneratedContent(data.generatedContent);
+      toast({
+        title: "Success",
+        description: "Content generated successfully!",
+      });
+    } catch (error) {
+      console.error('Error generating content:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate content. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const demoContent = (
@@ -53,6 +77,8 @@ const Writing = () => {
           <SelectItem value="social-media">Social Media Post</SelectItem>
           <SelectItem value="product-description">Product Description</SelectItem>
           <SelectItem value="article">Article</SelectItem>
+          <SelectItem value="essay">Essay</SelectItem>
+          <SelectItem value="press-release">Press Release</SelectItem>
         </SelectContent>
       </Select>
       
@@ -62,19 +88,63 @@ const Writing = () => {
         onChange={(e) => setTopic(e.target.value)}
         className="text-[#22201d]"
       />
+
+      <Select value={tone} onValueChange={setTone}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select tone (optional)" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="professional">Professional</SelectItem>
+          <SelectItem value="casual">Casual</SelectItem>
+          <SelectItem value="friendly">Friendly</SelectItem>
+          <SelectItem value="formal">Formal</SelectItem>
+          <SelectItem value="persuasive">Persuasive</SelectItem>
+          <SelectItem value="informative">Informative</SelectItem>
+        </SelectContent>
+      </Select>
+
+      <Select value={length} onValueChange={setLength}>
+        <SelectTrigger>
+          <SelectValue placeholder="Select length (optional)" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="short">Short</SelectItem>
+          <SelectItem value="medium">Medium</SelectItem>
+          <SelectItem value="long">Long</SelectItem>
+        </SelectContent>
+      </Select>
       
       <Button 
         onClick={generateContent}
         disabled={!contentType || !topic.trim() || isGenerating}
-        className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
+        className="bg-[#6cae75] hover:bg-[#5a9d64] text-white w-full"
       >
-        {isGenerating ? "Opening Jasper..." : "Generate with Jasper AI"}
+        {isGenerating ? "Generating..." : "Generate with Perplexity AI"}
       </Button>
       
       {generatedContent && (
         <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
-          <h4 className="font-medium text-[#22201d] mb-2">Status:</h4>
-          <p className="text-[#22201d] opacity-80">{generatedContent}</p>
+          <h4 className="font-medium text-[#22201d] mb-2">Generated Content:</h4>
+          <Textarea
+            value={generatedContent}
+            onChange={(e) => setGeneratedContent(e.target.value)}
+            className="min-h-[200px] text-[#22201d] resize-none"
+            placeholder="Your generated content will appear here..."
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-2"
+            onClick={() => {
+              navigator.clipboard.writeText(generatedContent);
+              toast({
+                title: "Copied!",
+                description: "Content copied to clipboard",
+              });
+            }}
+          >
+            Copy to Clipboard
+          </Button>
         </div>
       )}
     </div>
@@ -90,24 +160,24 @@ const Writing = () => {
       videoTitle="AI Writing Masterclass"
       videoDescription="Learn to create engaging content with AI writing tools"
       demoTitle="Try AI Writing"
-      demoDescription="Generate professional content for any purpose"
+      demoDescription="Generate professional content for any purpose with Perplexity AI"
       demoContent={demoContent}
     >
       <AffiliateCard
-        title="Jasper AI"
-        description="Professional AI writing assistant for marketing teams and content creators."
+        title="Perplexity Pro"
+        description="Advanced AI search and writing assistant with real-time information access."
         features={[
-          "50+ writing templates",
-          "Brand voice training",
-          "SEO optimization",
-          "Team collaboration"
+          "Real-time web search",
+          "Advanced reasoning",
+          "Multiple AI models",
+          "Unlimited queries"
         ]}
-        ctaText="Start Free Trial"
-        affiliateUrl="https://www.jasper.ai"
-        commission="30% recurring"
-        rating={4.7}
+        ctaText="Get Perplexity Pro"
+        affiliateUrl="https://www.perplexity.ai/pro"
+        commission="Available through partnerships"
+        rating={4.8}
         onAffiliateClick={trackAffiliateClick}
-        service="jasper"
+        service="perplexity"
       />
     </CategoryPageLayout>
   );
