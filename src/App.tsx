@@ -19,8 +19,10 @@ import Business from "./pages/Business";
 import Data from "./pages/Data";
 import Website from "./pages/Website";
 import Category from "./pages/Category";
+import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AdminRoute } from "./components/AdminRoute";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +48,7 @@ const App = () => (
             <Route path="/data" element={<ProtectedRoute><Data /></ProtectedRoute>} />
             <Route path="/website" element={<ProtectedRoute><Website /></ProtectedRoute>} />
             <Route path="/category/:id" element={<ProtectedRoute><Category /></ProtectedRoute>} />
+            <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
