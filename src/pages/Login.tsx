@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,7 +36,6 @@ const Login = () => {
           title: "Success",
           description: "Signed in successfully!",
         });
-        // Redirect to dashboard after successful login
         navigate("/dashboard");
       }
     } catch (error) {
@@ -50,8 +50,8 @@ const Login = () => {
   };
 
   const fillDefaultCredentials = () => {
-    setEmail("user@example.com");
-    setPassword("password");
+    setEmail("demo@demo.com");
+    setPassword("demopassword123");
   };
 
   return (
@@ -75,15 +75,15 @@ const Login = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Default Credentials Info */}
+            {/* Demo Credentials Info */}
             <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-start space-x-3">
                 <Info className="h-5 w-5 text-blue-600 mt-0.5" />
                 <div className="flex-1">
                   <h4 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h4>
                   <div className="text-sm text-blue-700 space-y-1">
-                    <p><strong>Email:</strong> user@example.com</p>
-                    <p><strong>Password:</strong> password</p>
+                    <p><strong>Email:</strong> demo@demo.com</p>
+                    <p><strong>Password:</strong> demopassword123</p>
                   </div>
                   <Button
                     type="button"
