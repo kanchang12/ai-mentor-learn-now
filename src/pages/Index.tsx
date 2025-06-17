@@ -20,8 +20,8 @@ const Index = () => {
   const categories = [
     {
       id: "general",
-      title: "AI Tutorials",
-      description: "Master ChatGPT and AI chat tools with comprehensive tutorials",
+      title: "Perplexity AI Chat",
+      description: "Connect to Perplexity API for real-time AI conversations with web search",
       icon: MessageSquare,
       color: "from-blue-500/20 to-cyan-500/20",
       borderColor: "border-blue-500/30",
@@ -30,8 +30,8 @@ const Index = () => {
     },
     {
       id: "writing",
-      title: "AI Writing Tools",
-      description: "Create professional content with AI writing assistants like Jasper",
+      title: "Jasper AI Writing",
+      description: "Professional content creation with Jasper AI's powerful writing API",
       icon: PenTool,
       color: "from-green-500/20 to-emerald-500/20",
       borderColor: "border-green-500/30",
@@ -40,8 +40,8 @@ const Index = () => {
     },
     {
       id: "images",
-      title: "AI Image Editing",
-      description: "Generate and edit stunning visuals with Midjourney and DALL-E",
+      title: "Leonardo AI Images",
+      description: "Generate stunning visuals with Leonardo AI's image generation API",
       icon: Image,
       color: "from-purple-500/20 to-pink-500/20",
       borderColor: "border-purple-500/30",
@@ -50,8 +50,8 @@ const Index = () => {
     },
     {
       id: "business",
-      title: "Business AI Automation",
-      description: "Streamline workflows with intelligent automation tools",
+      title: "Make.com Automation",
+      description: "Automate workflows with Make.com's visual automation platform",
       icon: Briefcase,
       color: "from-orange-500/20 to-red-500/20",
       borderColor: "border-orange-500/30",
@@ -60,8 +60,8 @@ const Index = () => {
     },
     {
       id: "data",
-      title: "AI Data Analysis",
-      description: "Extract insights from data using artificial intelligence",
+      title: "Claude AI Analysis",
+      description: "Extract insights from data using Claude AI's reasoning capabilities",
       icon: BarChart3,
       color: "from-indigo-500/20 to-blue-500/20",
       borderColor: "border-indigo-500/30",
@@ -70,8 +70,8 @@ const Index = () => {
     },
     {
       id: "website",
-      title: "AI Website Builder",
-      description: "Build professional websites with AI assistance and tools",
+      title: "Wix AI Builder",
+      description: "Build professional websites with Wix's AI-powered design tools",
       icon: Globe,
       color: "from-teal-500/20 to-cyan-500/20",
       borderColor: "border-teal-500/30",
