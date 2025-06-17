@@ -11,7 +11,11 @@ import {
   DollarSign,
   TrendingUp,
   Shield,
-  Settings
+  Settings,
+  Key,
+  Video,
+  FileText,
+  HelpCircle
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +26,7 @@ interface User {
   email: string;
   full_name: string;
   created_at: string;
-  role?: string;
+  user_roles?: { role: string }[];
 }
 
 interface UsageStats {
@@ -69,7 +73,7 @@ const Admin = () => {
 
       const usersWithRoles = profilesData?.map(profile => ({
         ...profile,
-        role: profile.user_roles?.[0]?.role || 'user'
+        user_roles: profile.user_roles || []
       })) || [];
 
       setUsers(usersWithRoles);
@@ -225,6 +229,41 @@ const Admin = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <CardContent className="p-4 text-center">
+              <Key className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+              <h3 className="font-semibold text-[#22201d]">API Keys</h3>
+              <p className="text-sm text-[#22201d] opacity-70">Manage secure API keys</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <CardContent className="p-4 text-center">
+              <Video className="h-8 w-8 text-green-600 mx-auto mb-2" />
+              <h3 className="font-semibold text-[#22201d]">Videos</h3>
+              <p className="text-sm text-[#22201d] opacity-70">Update demo videos</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <CardContent className="p-4 text-center">
+              <FileText className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+              <h3 className="font-semibold text-[#22201d]">Content</h3>
+              <p className="text-sm text-[#22201d] opacity-70">Edit text & pricing</p>
+            </CardContent>
+          </Card>
+
+          <Card className="cursor-pointer hover:shadow-lg transition-shadow">
+            <CardContent className="p-4 text-center">
+              <HelpCircle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+              <h3 className="font-semibold text-[#22201d]">Support</h3>
+              <p className="text-sm text-[#22201d] opacity-70">Help users</p>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
           <Card>
@@ -282,8 +321,9 @@ const Admin = () => {
         <Tabs defaultValue="users" className="space-y-6">
           <TabsList>
             <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="usage">Usage Analytics</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
+            <TabsTrigger value="api-keys">API Keys</TabsTrigger>
+            <TabsTrigger value="content">Content</TabsTrigger>
+            <TabsTrigger value="analytics">Analytics</TabsTrigger>
           </TabsList>
 
           <TabsContent value="users">
@@ -294,91 +334,176 @@ const Admin = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {users.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <p className="font-medium text-[#22201d]">{user.full_name || 'No name'}</p>
-                        <p className="text-sm text-[#22201d] opacity-70">{user.email}</p>
-                        <p className="text-xs text-[#22201d] opacity-50">
-                          Joined: {new Date(user.created_at).toLocaleDateString()}
-                        </p>
+                  {users.map((user) => {
+                    const isAdmin = user.user_roles?.some(role => role.role === 'admin');
+                    return (
+                      <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                          <p className="font-medium text-[#22201d]">{user.full_name || 'No name'}</p>
+                          <p className="text-sm text-[#22201d] opacity-70">{user.email}</p>
+                          <p className="text-xs text-[#22201d] opacity-50">
+                            Joined: {new Date(user.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Badge variant={isAdmin ? 'destructive' : 'secondary'}>
+                            {isAdmin ? 'admin' : 'user'}
+                          </Badge>
+                          {isAdmin ? (
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => demoteUser(user.id)}
+                            >
+                              Remove Admin
+                            </Button>
+                          ) : (
+                            <Button 
+                              size="sm" 
+                              onClick={() => promoteToAdmin(user.id)}
+                            >
+                              Make Admin
+                            </Button>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={user.role === 'admin' ? 'destructive' : 'secondary'}>
-                          {user.role}
-                        </Badge>
-                        {user.role === 'admin' ? (
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => demoteUser(user.id)}
-                          >
-                            Remove Admin
-                          </Button>
-                        ) : (
-                          <Button 
-                            size="sm" 
-                            onClick={() => promoteToAdmin(user.id)}
-                          >
-                            Make Admin
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="usage">
+          <TabsContent value="api-keys">
             <Card>
               <CardHeader>
-                <CardTitle>Usage Analytics</CardTitle>
-                <CardDescription>Monitor system usage across categories</CardDescription>
+                <CardTitle>API Keys Management</CardTitle>
+                <CardDescription>Securely manage API keys for services</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {usageStats.map((stat) => (
-                    <div key={stat.category} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <p className="font-medium text-[#22201d] capitalize">{stat.category}</p>
-                        <p className="text-sm text-[#22201d] opacity-70">{stat.user_count} users</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-[#22201d]">{stat.total_usage}</p>
-                        <p className="text-sm text-[#22201d] opacity-70">minutes</p>
-                      </div>
-                    </div>
-                  ))}
+                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <h3 className="font-semibold text-blue-900 mb-2">Security Note</h3>
+                    <p className="text-sm text-blue-800">
+                      API keys are stored securely in Supabase Edge Function secrets. 
+                      They are never exposed in the frontend code and are only accessible 
+                      to server-side functions.
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card>
+                      <CardContent className="p-4">
+                        <h4 className="font-medium mb-2">OpenAI API Key</h4>
+                        <p className="text-sm text-gray-600 mb-3">For AI chat functionality</p>
+                        <Button size="sm" variant="outline">
+                          Update Key
+                        </Button>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="p-4">
+                        <h4 className="font-medium mb-2">Replicate API Key</h4>
+                        <p className="text-sm text-gray-600 mb-3">For image generation</p>
+                        <Button size="sm" variant="outline">
+                          Update Key
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          <TabsContent value="payments">
+          <TabsContent value="content">
             <Card>
               <CardHeader>
-                <CardTitle>Payment Overview</CardTitle>
-                <CardDescription>Monitor revenue and subscription status</CardDescription>
+                <CardTitle>Content Management</CardTitle>
+                <CardDescription>Update text, videos, and pricing</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="p-4 border rounded-lg text-center">
-                    <p className="text-2xl font-bold text-green-600">${paymentStats.total_revenue}</p>
-                    <p className="text-sm text-[#22201d] opacity-70">Total Revenue</p>
-                  </div>
-                  <div className="p-4 border rounded-lg text-center">
-                    <p className="text-2xl font-bold text-blue-600">{paymentStats.active_subscriptions}</p>
-                    <p className="text-sm text-[#22201d] opacity-70">Active Subscriptions</p>
-                  </div>
-                  <div className="p-4 border rounded-lg text-center">
-                    <p className="text-2xl font-bold text-red-600">{paymentStats.failed_payments}</p>
-                    <p className="text-sm text-[#22201d] opacity-70">Failed Payments</p>
-                  </div>
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <Video className="h-12 w-12 text-green-600 mx-auto mb-3" />
+                      <h4 className="font-medium mb-2">Demo Videos</h4>
+                      <p className="text-sm text-gray-600 mb-3">Update category demo videos</p>
+                      <Button size="sm">Manage Videos</Button>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <FileText className="h-12 w-12 text-purple-600 mx-auto mb-3" />
+                      <h4 className="font-medium mb-2">Text Content</h4>
+                      <p className="text-sm text-gray-600 mb-3">Edit descriptions and copy</p>
+                      <Button size="sm">Edit Content</Button>
+                    </CardContent>
+                  </Card>
+                  
+                  <Card>
+                    <CardContent className="p-4 text-center">
+                      <DollarSign className="h-12 w-12 text-yellow-600 mx-auto mb-3" />
+                      <h4 className="font-medium mb-2">Pricing</h4>
+                      <p className="text-sm text-gray-600 mb-3">Update subscription plans</p>
+                      <Button size="sm">Edit Pricing</Button>
+                    </CardContent>
+                  </Card>
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="analytics">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Usage Analytics</CardTitle>
+                  <CardDescription>Monitor system usage across categories</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {usageStats.map((stat) => (
+                      <div key={stat.category} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                          <p className="font-medium text-[#22201d] capitalize">{stat.category}</p>
+                          <p className="text-sm text-[#22201d] opacity-70">{stat.user_count} users</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-2xl font-bold text-[#22201d]">{stat.total_usage}</p>
+                          <p className="text-sm text-[#22201d] opacity-70">minutes</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Payment Overview</CardTitle>
+                  <CardDescription>Monitor revenue and subscription status</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="p-4 border rounded-lg text-center">
+                      <p className="text-2xl font-bold text-green-600">${paymentStats.total_revenue}</p>
+                      <p className="text-sm text-[#22201d] opacity-70">Total Revenue</p>
+                    </div>
+                    <div className="p-4 border rounded-lg text-center">
+                      <p className="text-2xl font-bold text-blue-600">{paymentStats.active_subscriptions}</p>
+                      <p className="text-sm text-[#22201d] opacity-70">Active Subscriptions</p>
+                    </div>
+                    <div className="p-4 border rounded-lg text-center">
+                      <p className="text-2xl font-bold text-red-600">{paymentStats.failed_payments}</p>
+                      <p className="text-sm text-[#22201d] opacity-70">Failed Payments</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
