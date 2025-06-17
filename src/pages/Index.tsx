@@ -1,8 +1,8 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { 
   PlayCircle, 
   Clock, 
@@ -15,10 +15,13 @@ import {
   TrendingUp,
   Zap,
   Brain,
-  Rocket
+  Rocket,
+  LogOut
 } from "lucide-react";
 
 const Index = () => {
+  const { user, signOut } = useAuth();
+
   const categories = [
     {
       id: "general",
@@ -138,17 +141,38 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <Link to="/login">
-                <Button variant="ghost" className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
-                  Sign In
-                </Button>
-              </Link>
-              <Link to="/signup">
-                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6">
-                  Start Learning
-                  <ArrowRight className="h-4 w-4 ml-2" />
-                </Button>
-              </Link>
+              {user ? (
+                <>
+                  <span className="text-gray-700">Welcome, {user.email}</span>
+                  <Link to="/dashboard">
+                    <Button variant="ghost" className="text-gray-700 hover:text-blue-600 hover:bg-blue-50">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button 
+                    variant="ghost" 
+                    onClick={signOut}
+                    className="text-gray-700 hover:text-red-600 hover:bg-red-50"
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link to="/auth">
+                    <Button variant="ghost" className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link to="/auth">
+                    <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all duration-200 px-6">
+                      Start Learning
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -178,10 +202,10 @@ const Index = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Link to="/signup" className="w-full sm:w-auto">
+            <Link to={user ? "/dashboard" : "/auth"} className="w-full sm:w-auto">
               <Button size="lg" className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                 <Rocket className="h-5 w-5 mr-2" />
-                Start Free Today
+                {user ? "Go to Dashboard" : "Start Free Today"}
               </Button>
             </Link>
             <div className="flex items-center text-sm text-gray-500">
@@ -222,7 +246,7 @@ const Index = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {categories.map((category) => (
-              <Link key={category.id} to={`/${category.id}`}>
+              <Link key={category.id} to={user ? `/${category.id}` : "/auth"}>
                 <Card className={`group hover:shadow-2xl transition-all duration-300 transform hover:scale-105 cursor-pointer border-2 ${category.borderColor} bg-gradient-to-br ${category.color} relative overflow-hidden`}>
                   <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full blur-xl transform translate-x-8 -translate-y-8"></div>
                   <CardHeader className="relative z-10">
@@ -308,10 +332,10 @@ const Index = () => {
             Start your journey today with 30 minutes of free daily access.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link to="/signup">
+            <Link to={user ? "/dashboard" : "/auth"}>
               <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                 <Sparkles className="h-5 w-5 mr-2" />
-                Get Started Free
+                {user ? "Go to Dashboard" : "Get Started Free"}
               </Button>
             </Link>
             <div className="flex items-center text-blue-100">
