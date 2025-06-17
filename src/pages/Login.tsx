@@ -4,27 +4,49 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { signIn } = useAuth();
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // TODO: Implement Supabase authentication
-    console.log("Login attempt:", { email, password });
-    
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success",
+          description: "Signed in successfully!",
+        });
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      // Redirect to dashboard on success
-    }, 1000);
+    }
   };
 
   return (
@@ -112,6 +134,12 @@ const Login = () => {
                   Sign up for free
                 </Link>
               </p>
+            </div>
+
+            <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-sm text-green-800 font-medium">Admin Test Account:</p>
+              <p className="text-xs text-green-700">Email: kanchan.g12@gmail.com</p>
+              <p className="text-xs text-green-700">Password: Poiuy@4321</p>
             </div>
           </CardContent>
         </Card>

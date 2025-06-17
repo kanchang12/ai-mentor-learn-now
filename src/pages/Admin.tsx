@@ -17,9 +17,7 @@ import {
   Video,
   FileText,
   HelpCircle,
-  Save,
-  Plus,
-  Trash2
+  Save
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from '@/integrations/supabase/client';
@@ -77,7 +75,7 @@ const Admin = () => {
 
   const fetchAdminData = async () => {
     try {
-      // Fetch users with their roles - fix the query structure
+      // Fetch users with their roles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
         .select('id, email, full_name, created_at');
@@ -267,45 +265,6 @@ const Admin = () => {
     });
   };
 
-  const createAdminUser = async () => {
-    try {
-      // First create the user account
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email: 'kanchan.g12@gmail.com',
-        password: 'Poiuy@4321',
-        options: {
-          data: {
-            full_name: 'Admin User'
-          }
-        }
-      });
-
-      if (signUpError) throw signUpError;
-
-      if (data.user) {
-        // Then assign admin role
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .upsert({ user_id: data.user.id, role: 'admin' });
-
-        if (roleError) throw roleError;
-
-        toast({
-          title: "Success",
-          description: "Admin user created successfully!",
-        });
-
-        fetchAdminData();
-      }
-    } catch (error) {
-      console.error('Error creating admin user:', error);
-      toast({
-        title: "Admin User",
-        description: "Admin user kanchan.g12@gmail.com is ready with password Poiuy@4321",
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="min-h-screen bg-[#fef9ed] flex items-center justify-center">
@@ -337,9 +296,6 @@ const Admin = () => {
                 </div>
               </div>
             </div>
-            <Button onClick={createAdminUser} className="bg-[#6cae75] hover:bg-[#5a9d64]">
-              Create Admin User
-            </Button>
           </div>
         </div>
       </header>
