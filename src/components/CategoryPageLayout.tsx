@@ -73,8 +73,10 @@ export const CategoryPageLayout = ({
                 title={pageContent.videoTitle}
                 className="w-full h-full"
                 frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
                 allowFullScreen
+                loading="lazy"
               />
             </div>
             <CardContent className="p-6">
