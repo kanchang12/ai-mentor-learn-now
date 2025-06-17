@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -202,9 +201,9 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
                   key={index}
                   title={card.title}
                   description={card.description}
-                  buttonText={card.buttonText}
-                  buttonUrl={card.buttonUrl}
-                  onButtonClick={() => trackAffiliateClick(card.service)}
+                  ctaText={card.buttonText}
+                  affiliateUrl={card.buttonUrl}
+                  onAffiliateClick={() => trackAffiliateClick(card.service)}
                 />
               ))}
             </div>

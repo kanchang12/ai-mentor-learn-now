@@ -16,6 +16,7 @@ import Images from "./pages/Images";
 import Book from "./pages/Book";
 import Data from "./pages/Data";
 import Website from "./pages/Website";
+import Music from "./pages/Music";
 import Admin from "./pages/Admin";
 import Settings from "./pages/Settings";
 import Billing from "./pages/Billing";
@@ -70,6 +71,11 @@ const App = () => (
               <Route path="/website" element={
                 <ProtectedRoute>
                   <Website />
+                </ProtectedRoute>
+              } />
+              <Route path="/music" element={
+                <ProtectedRoute>
+                  <Music />
                 </ProtectedRoute>
               } />
               <Route path="/admin" element={
