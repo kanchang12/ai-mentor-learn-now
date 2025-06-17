@@ -10,29 +10,23 @@ const Billing = () => {
 
   const handleUpgradeToPro = () => {
     toast({
-      title: "Payment Processing",
-      description: "Redirecting to secure payment...",
+      title: "Upgrade to Pro",
+      description: "Pro plan upgrade feature coming soon! Contact support for early access.",
     });
-    // Open payment in new tab
-    window.open('https://buy.stripe.com/test_payment_link', '_blank');
   };
 
   const handleContactSales = () => {
     toast({
       title: "Contact Sales",
-      description: "Redirecting to contact form...",
+      description: "Enterprise sales team will be in touch soon!",
     });
-    // You can replace this with actual contact form or email
-    window.open('mailto:sales@howtouseai.com?subject=Enterprise Plan Inquiry', '_blank');
   };
 
   const handleAddPaymentMethod = () => {
     toast({
-      title: "Payment Method",
-      description: "Redirecting to payment setup...",
+      title: "Add Payment Method",
+      description: "Payment method setup coming soon! You'll be notified when available.",
     });
-    // Open payment method setup
-    window.open('https://billing.stripe.com/p/login/test_setup', '_blank');
   };
 
   return (
