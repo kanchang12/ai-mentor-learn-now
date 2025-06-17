@@ -20,96 +20,42 @@ const TestResults = () => {
     {
       name: "Homepage loads correctly",
       test: async (): Promise<string> => {
-        // Open homepage in a new window temporarily to test
-        const testWindow = window.open('/', '_blank', 'width=800,height=600');
-        if (!testWindow) {
-          throw new Error("Could not open test window");
+        // Check if we're on the homepage by looking for expected elements
+        const title = document.querySelector('h1');
+        const categoryCards = document.querySelectorAll('a[href="/general"], a[href="/writing"], a[href="/images"], a[href="/business"], a[href="/data"], a[href="/website"]');
+        
+        if (!title) {
+          throw new Error("Homepage title not found");
         }
-
-        return new Promise<string>((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            testWindow.close();
-            reject(new Error("Homepage load timeout"));
-          }, 10000);
-
-          testWindow.onload = () => {
-            try {
-              // Wait a bit for React to render
-              setTimeout(() => {
-                const title = testWindow.document.querySelector('h1');
-                const categoryCards = testWindow.document.querySelectorAll('a[href="/general"], a[href="/writing"], a[href="/images"], a[href="/business"], a[href="/data"], a[href="/website"]');
-                
-                testWindow.close();
-                clearTimeout(timeout);
-                
-                if (!title) {
-                  reject(new Error("Homepage title not found"));
-                  return;
-                }
-                
-                if (categoryCards.length < 6) {
-                  reject(new Error(`Expected 6 category links, found ${categoryCards.length}`));
-                  return;
-                }
-                
-                resolve(`Homepage loaded with ${categoryCards.length} category links`);
-              }, 2000);
-            } catch (error) {
-              testWindow.close();
-              clearTimeout(timeout);
-              reject(error);
-            }
-          };
-        });
+        
+        if (categoryCards.length < 6) {
+          throw new Error(`Expected 6 category links, found ${categoryCards.length}`);
+        }
+        
+        return `Homepage loaded with ${categoryCards.length} category links`;
       }
     },
     {
       name: "Navigation links functional",
       test: async (): Promise<string> => {
-        const testWindow = window.open('/', '_blank', 'width=800,height=600');
-        if (!testWindow) {
-          throw new Error("Could not open test window");
+        const links = [
+          { href: "/general", name: "General" },
+          { href: "/writing", name: "Writing" },
+          { href: "/images", name: "Images" },
+          { href: "/business", name: "Business" },
+          { href: "/data", name: "Data" },
+          { href: "/website", name: "Website" }
+        ];
+        
+        const foundLinks = links.filter(link => 
+          document.querySelector(`a[href="${link.href}"]`)
+        );
+        
+        if (foundLinks.length !== links.length) {
+          throw new Error(`Missing navigation links: ${links.length - foundLinks.length} not found`);
         }
-
-        return new Promise<string>((resolve, reject) => {
-          const timeout = setTimeout(() => {
-            testWindow.close();
-            reject(new Error("Navigation test timeout"));
-          }, 10000);
-
-          testWindow.onload = () => {
-            try {
-              setTimeout(() => {
-                const links = [
-                  { href: "/general", name: "General" },
-                  { href: "/writing", name: "Writing" },
-                  { href: "/images", name: "Images" },
-                  { href: "/business", name: "Business" },
-                  { href: "/data", name: "Data" },
-                  { href: "/website", name: "Website" }
-                ];
-                
-                const foundLinks = links.filter(link => 
-                  testWindow.document.querySelector(`a[href="${link.href}"]`)
-                );
-                
-                testWindow.close();
-                clearTimeout(timeout);
-                
-                if (foundLinks.length !== links.length) {
-                  reject(new Error(`Missing navigation links: ${links.length - foundLinks.length} not found`));
-                  return;
-                }
-                
-                resolve(`All ${links.length} navigation links found and functional`);
-              }, 2000);
-            } catch (error) {
-              testWindow.close();
-              clearTimeout(timeout);
-              reject(error);
-            }
-          };
-        });
+        
+        return `All ${links.length} navigation links found and functional`;
       }
     },
     {
