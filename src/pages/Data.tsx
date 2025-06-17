@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BarChart3, Download } from "lucide-react";
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { useToast } from "@/hooks/use-toast";
+import { VoiceAgent } from "@/components/VoiceAgent";
 
 const Data = () => {
   const [analysisType, setAnalysisType] = useState("");
@@ -102,18 +103,21 @@ const Data = () => {
   );
 
   return (
-    <CategoryPageLayout
-      category="data"
-      title="AI Data Analysis"
-      description="Extract insights from your data with AI"
-      icon={<BarChart3 className="h-5 w-5 text-indigo-600" />}
-      videoId="data123"
-      videoTitle="AI Data Analysis Mastery"
-      videoDescription="Learn to analyze data and extract insights with AI"
-      demoTitle="Try Data Analysis"
-      demoDescription="Analyze your data and get AI-powered insights"
-      demoContent={demoContent}
-    />
+    <>
+      <CategoryPageLayout
+        category="data"
+        title="AI Data Analysis"
+        description="Extract insights from your data with AI"
+        icon={<BarChart3 className="h-5 w-5 text-indigo-600" />}
+        videoId="data123"
+        videoTitle="AI Data Analysis Mastery"
+        videoDescription="Learn to analyze data and extract insights with AI"
+        demoTitle="Try Data Analysis"
+        demoDescription="Analyze your data and get AI-powered insights"
+        demoContent={demoContent}
+      />
+      <VoiceAgent pageContext="data" />
+    </>
   );
 };
 

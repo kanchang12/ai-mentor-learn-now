@@ -10,8 +10,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("test@example.com"); // Default email
+  const [password, setPassword] = useState("password123"); // Default password
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { signIn } = useAuth();
@@ -22,10 +22,13 @@ const Login = () => {
     e.preventDefault();
     setIsLoading(true);
     
+    console.log('Login form submitted with:', { email, password });
+    
     try {
       const { error } = await signIn(email, password);
       
       if (error) {
+        console.error('Login error:', error);
         toast({
           title: "Error",
           description: error.message,
@@ -39,6 +42,7 @@ const Login = () => {
         navigate("/dashboard");
       }
     } catch (error) {
+      console.error('Unexpected login error:', error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -68,6 +72,13 @@ const Login = () => {
             <CardDescription>
               Sign in to continue your AI learning journey
             </CardDescription>
+            
+            {/* Default credentials info */}
+            <div className="mt-4 p-3 bg-blue-50 rounded-lg text-sm">
+              <p className="font-medium text-blue-800">Demo Credentials:</p>
+              <p className="text-blue-700">Email: test@example.com</p>
+              <p className="text-blue-700">Password: password123</p>
+            </div>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
