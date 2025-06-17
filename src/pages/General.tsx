@@ -94,7 +94,6 @@ const General = () => {
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
           className="min-h-[60px] text-[#22201d]"
-          type="password"
         />
       </div>
       
