@@ -1,11 +1,14 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, ArrowLeft, CreditCard, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect, useRef } from "react";
 
 const Billing = () => {
   const { toast } = useToast();
+  const paypalRef = useRef<HTMLDivElement>(null);
 
   const handleUpgradeToPro = () => {
     toast({
@@ -31,6 +34,47 @@ const Billing = () => {
     });
     window.open('mailto:support@howtouseai.com?subject=Add Payment Method', '_blank');
   };
+
+  useEffect(() => {
+    // Load PayPal SDK
+    const script = document.createElement('script');
+    script.src = 'https://www.paypal.com/sdk/js?client-id=AVKxMbT8tz0EQCLg5Rt2biPRfqWU4DCZ90agiBqkxxOgzKoR1KBo2ejZedD2hhcec_pNVCn096sr_Dml&vault=true&intent=subscription';
+    script.setAttribute('data-sdk-integration-source', 'button-factory');
+    
+    script.onload = () => {
+      if (window.paypal && paypalRef.current) {
+        window.paypal.Buttons({
+          style: {
+            shape: 'rect',
+            color: 'gold',
+            layout: 'vertical',
+            label: 'subscribe'
+          },
+          createSubscription: function(data: any, actions: any) {
+            return actions.subscription.create({
+              plan_id: 'P-7N8009650M991643SNBIYENI'
+            });
+          },
+          onApprove: function(data: any, actions: any) {
+            toast({
+              title: "Subscription Created!",
+              description: `Subscription ID: ${data.subscriptionID}`,
+            });
+            console.log('Subscription ID:', data.subscriptionID);
+          }
+        }).render(paypalRef.current);
+      }
+    };
+
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup script when component unmounts
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
+      }
+    };
+  }, [toast]);
 
   return (
     <div className="min-h-screen bg-[#fef9ed]">
@@ -116,13 +160,11 @@ const Billing = () => {
                     <span className="text-[#22201d] opacity-80">Downloadable resources</span>
                   </div>
                 </div>
-                <Button 
-                  onClick={handleUpgradeToPro}
-                  className="w-full mt-6 bg-[#6cae75] hover:bg-[#5a9d64] text-white font-bold py-3 rounded-[30px]"
-                >
-                  <CreditCard className="h-4 w-4 mr-2" />
-                  Upgrade to Pro
-                </Button>
+                
+                {/* PayPal Subscription Button */}
+                <div className="mt-6">
+                  <div ref={paypalRef} id="paypal-button-container-P-7N8009650M991643SNBIYENI"></div>
+                </div>
               </CardContent>
             </Card>
 
@@ -210,5 +252,12 @@ const Billing = () => {
     </div>
   );
 };
+
+// Add TypeScript declaration for PayPal
+declare global {
+  interface Window {
+    paypal: any;
+  }
+}
 
 export default Billing;
