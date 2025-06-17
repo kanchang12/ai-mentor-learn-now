@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Link, useNavigate } from "react-router-dom";
-import { Eye, EyeOff, ArrowLeft, Info } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
@@ -49,11 +49,6 @@ const Login = () => {
     }
   };
 
-  const fillDefaultCredentials = () => {
-    setEmail("demo@demo.com");
-    setPassword("demopassword123");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -75,29 +70,6 @@ const Login = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Demo Credentials Info */}
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <div className="flex items-start space-x-3">
-                <Info className="h-5 w-5 text-blue-600 mt-0.5" />
-                <div className="flex-1">
-                  <h4 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h4>
-                  <div className="text-sm text-blue-700 space-y-1">
-                    <p><strong>Email:</strong> demo@demo.com</p>
-                    <p><strong>Password:</strong> demopassword123</p>
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="mt-3 text-blue-600 border-blue-300 hover:bg-blue-100"
-                    onClick={fillDefaultCredentials}
-                  >
-                    Use Demo Credentials
-                  </Button>
-                </div>
-              </div>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>

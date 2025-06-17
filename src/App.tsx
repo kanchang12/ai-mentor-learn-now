@@ -19,7 +19,6 @@ import Website from "./pages/Website";
 import Admin from "./pages/Admin";
 import Settings from "./pages/Settings";
 import Billing from "./pages/Billing";
-import TestResults from "./pages/TestResults";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AdminRoute } from "./components/AdminRoute";
@@ -38,11 +37,6 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              <Route path="/test-results" element={
-                <AdminRoute>
-                  <TestResults />
-                </AdminRoute>
-              } />
               <Route path="/dashboard" element={
                 <ProtectedRoute>
                   <Dashboard />
