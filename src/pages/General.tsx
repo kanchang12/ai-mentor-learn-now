@@ -1,80 +1,88 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { 
-  PlayCircle, 
-  Clock, 
-  CheckCircle, 
   ArrowLeft,
   MessageSquare,
   Send,
   Bot,
   User,
   Minimize2,
-  Maximize2
+  Maximize2,
+  Sparkles,
+  Mic,
+  MicOff
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useUsageTracking } from "@/hooks/useUsageTracking";
+import { UsageMeter } from "@/components/UsageMeter";
+import { AffiliateCard } from "@/components/AffiliateCard";
 
 const General = () => {
-  const [selectedVideo, setSelectedVideo] = useState(0);
+  const [prompt, setPrompt] = useState("");
+  const [response, setResponse] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [chatMinimized, setChatMinimized] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const { usageMinutes, isLimitReached, loading, trackUsage, trackAffiliateClick, remainingMinutes } = useUsageTracking('general');
+  
   const [chatMessages, setChatMessages] = useState([
     {
       id: 1,
       sender: "ai",
-      message: "Hello! I'm your AI companion for general AI usage. I can help you understand ChatGPT, Claude, and other AI tools. What would you like to learn about?",
+      message: "Hello! I'm your AI assistant powered by multiple models. I can help with general tasks, answer questions, and guide you through using AI tools. What would you like to explore?",
       timestamp: "Just now"
     }
   ]);
 
-  const tutorials = [
-    {
-      id: 1,
-      title: "ChatGPT Fundamentals",
-      description: "Master the basics of ChatGPT prompting and conversation techniques",
-      duration: "15 min",
-      difficulty: "Beginner",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 2,
-      title: "Claude vs ChatGPT Comparison",
-      description: "Learn when to use Claude vs ChatGPT for different tasks",
-      duration: "12 min",
-      difficulty: "Beginner",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 3,
-      title: "Advanced Prompt Engineering",
-      description: "Create powerful prompts that get better AI responses",
-      duration: "25 min",
-      difficulty: "Intermediate",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
-    },
-    {
-      id: 4,
-      title: "AI Ethics and Best Practices",
-      description: "Understand responsible AI usage and limitations",
-      duration: "18 min",
-      difficulty: "Beginner",
-      completed: false,
-      videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ"
+  // Voice recognition setup
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      // Voice recognition is supported
     }
-  ];
+  }, []);
 
-  const currentVideo = tutorials[selectedVideo];
+  const startListening = () => {
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new (window as any).webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
 
-  const sendMessage = () => {
+      recognition.onstart = () => setIsListening(true);
+      recognition.onend = () => setIsListening(false);
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        setPrompt(transcript);
+      };
+
+      recognition.start();
+    }
+  };
+
+  const generateResponse = async () => {
+    if (!prompt.trim() || isLimitReached) return;
+
+    setIsGenerating(true);
+    try {
+      // Simulate API call - replace with actual Perplexity API
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setResponse(`Here's a comprehensive response to: "${prompt}"\n\nThis is a demo response. In production, this would be powered by Perplexity API providing real-time AI assistance with web search capabilities.`);
+      await trackUsage(2); // Track 2 minutes of usage
+    } catch (error) {
+      setResponse("Sorry, there was an error generating the response. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const sendChatMessage = () => {
     if (!chatMessage.trim()) return;
 
     const newUserMessage = {
@@ -91,7 +99,7 @@ const General = () => {
       const aiResponse = {
         id: Date.now() + 1,
         sender: "ai", 
-        message: "That's a great question about AI tools! Here are some key points you should know...",
+        message: "I can help guide you through using various AI tools. Try the demo above, or check out the recommended tools on the right for more advanced features!",
         timestamp: "Just now"
       };
       setChatMessages(prev => [...prev, aiResponse]);
@@ -116,143 +124,79 @@ const General = () => {
                   <span className="text-2xl">🤖</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-[#22201d]">General AI Use</h1>
-                  <p className="text-sm text-[#22201d] opacity-70">Master ChatGPT, Claude, and essential AI fundamentals</p>
+                  <h1 className="text-xl font-bold text-[#22201d]">General AI Assistant</h1>
+                  <p className="text-sm text-[#22201d] opacity-70">Powered by Perplexity & Replicate APIs</p>
                 </div>
               </div>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-[#e9ecf1] rounded-lg px-3 py-2">
-                <Clock className="h-4 w-4 text-[#22201d]" />
-                <span className="text-sm font-medium text-[#22201d]">18 minutes left</span>
-              </div>
-            </div>
+            <UsageMeter 
+              usageMinutes={usageMinutes} 
+              isLimitReached={isLimitReached} 
+              loading={loading} 
+            />
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Video Player Section */}
+          {/* Main Demo Section */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Video Player */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardContent className="p-0">
-                <div className="aspect-video bg-gray-100 rounded-t-[20px] flex items-center justify-center relative overflow-hidden">
-                  <iframe
-                    src={currentVideo.videoUrl}
-                    title={currentVideo.title}
-                    className="w-full h-full absolute inset-0"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                  <div className="absolute bottom-4 left-4 z-10 bg-black/60 rounded-lg px-3 py-1">
-                    <p className="text-white font-semibold text-sm">{currentVideo.title}</p>
-                    <p className="text-gray-200 text-xs">{currentVideo.duration}</p>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <Badge variant="secondary" className="bg-[#e9ecf1] text-[#22201d]">
-                      {currentVideo.duration}
-                    </Badge>
-                    <div className="flex items-center space-x-2">
-                      <Badge className={`${currentVideo.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' : currentVideo.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}`}>
-                        {currentVideo.difficulty}
-                      </Badge>
-                      {currentVideo.completed && (
-                        <Badge className="bg-green-600 text-white">
-                          <CheckCircle className="h-3 w-3 mr-1" />
-                          Completed
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-                  <h2 className="text-2xl font-bold text-[#22201d] mb-2">
-                    {currentVideo.title}
-                  </h2>
-                  <p className="text-[#22201d] opacity-70 mb-4">{currentVideo.description}</p>
-                  
-                  <div className="flex items-center justify-between">
-                    <div className="flex space-x-2">
-                      <Button className="bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Mark Complete
-                      </Button>
-                      <Button variant="outline" className="border-gray-300 text-[#22201d] hover:bg-[#e9ecf1] rounded-[30px]">
-                        <MessageSquare className="h-4 w-4 mr-2" />
-                        Ask AI
-                      </Button>
-                    </div>
-                    <div className="text-sm text-[#22201d] opacity-70">
-                      Video {selectedVideo + 1} of {tutorials.length}
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Progress Card */}
+            {/* AI Demo */}
             <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
               <CardHeader>
-                <CardTitle className="text-lg text-[#22201d]">Your Progress</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#22201d] opacity-70">General AI Category Progress</span>
-                    <span className="font-medium text-[#22201d]">0% complete</span>
-                  </div>
-                  <Progress value={0} className="h-2" />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Video List */}
-            <Card className="bg-white border border-gray-200 rounded-[20px] shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-lg text-[#22201d]">AI Tutorials</CardTitle>
+                <CardTitle className="text-xl text-[#22201d] flex items-center">
+                  <Sparkles className="h-5 w-5 mr-2 text-[#6cae75]" />
+                  AI Assistant Demo
+                </CardTitle>
                 <CardDescription className="text-[#22201d] opacity-70">
-                  {tutorials.length} videos in this category
+                  Try our AI assistant powered by multiple models. Ask anything!
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {tutorials.map((video, index) => (
-                    <div
-                      key={video.id}
-                      className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                        selectedVideo === index 
-                          ? 'border-[#6cae75] bg-[#6cae75]/10' 
-                          : 'border-gray-200 hover:border-[#6cae75] hover:bg-[#e9ecf1]'
-                      }`}
-                      onClick={() => setSelectedVideo(index)}
+              <CardContent className="space-y-4">
+                <div className="flex space-x-2">
+                  <Textarea
+                    placeholder="Ask me anything... (e.g., 'Explain quantum computing', 'Write a poem about AI')"
+                    value={prompt}
+                    onChange={(e) => setPrompt(e.target.value)}
+                    className="flex-1 min-h-[100px] text-[#22201d]"
+                    disabled={isLimitReached}
+                  />
+                  <div className="flex flex-col space-y-2">
+                    <Button 
+                      onClick={startListening}
+                      variant="outline"
+                      size="sm"
+                      disabled={isListening || isLimitReached}
+                      className="border-gray-300"
                     >
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                          video.completed ? 'bg-[#6cae75]' : 'bg-gray-200'
-                        }`}>
-                          {video.completed ? (
-                            <CheckCircle className="h-4 w-4 text-white" />
-                          ) : (
-                            <PlayCircle className="h-4 w-4 text-[#22201d]" />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-[#22201d] truncate">
-                            {video.title}
-                          </p>
-                          <p className="text-xs text-[#22201d] opacity-70">{video.duration}</p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    </Button>
+                    <Button 
+                      onClick={generateResponse}
+                      disabled={!prompt.trim() || isGenerating || isLimitReached}
+                      className="bg-[#6cae75] hover:bg-[#5a9d64] text-white"
+                    >
+                      {isGenerating ? "Generating..." : "Ask AI"}
+                    </Button>
+                  </div>
                 </div>
+                
+                {response && (
+                  <div className="mt-4 p-4 bg-[#e9ecf1] rounded-lg">
+                    <h4 className="font-medium text-[#22201d] mb-2">AI Response:</h4>
+                    <p className="text-[#22201d] whitespace-pre-wrap">{response}</p>
+                  </div>
+                )}
+
+                {isLimitReached && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-800 text-sm">
+                      You've reached your daily limit of 30 minutes. Upgrade for unlimited access!
+                    </p>
+                  </div>
+                )}
               </CardContent>
             </Card>
 
@@ -265,8 +209,8 @@ const General = () => {
                       <Bot className="h-4 w-4 text-white" />
                     </div>
                     <div>
-                      <CardTitle className="text-base text-[#22201d]">AI General Companion</CardTitle>
-                      <CardDescription className="text-xs text-[#22201d] opacity-70">Ask questions about AI tools and techniques</CardDescription>
+                      <CardTitle className="text-base text-[#22201d]">AI Guide</CardTitle>
+                      <CardDescription className="text-xs text-[#22201d] opacity-70">Get help using AI tools</CardDescription>
                     </div>
                   </div>
                   <Button
@@ -315,18 +259,67 @@ const General = () => {
                   
                   <div className="flex space-x-2">
                     <Input
-                      placeholder="Ask about AI tools and techniques..."
+                      placeholder="Ask about AI tools..."
                       value={chatMessage}
                       onChange={(e) => setChatMessage(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                      onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
                       className="text-sm bg-white border-gray-300 text-[#22201d] placeholder:text-[#22201d] placeholder:opacity-50"
                     />
-                    <Button size="sm" onClick={sendMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
+                    <Button size="sm" onClick={sendChatMessage} className="bg-[#6cae75] hover:bg-[#5a9d64]">
                       <Send className="h-4 w-4" />
                     </Button>
                   </div>
                 </CardContent>
               )}
+            </Card>
+          </div>
+
+          {/* Sidebar with Affiliate Tools */}
+          <div className="space-y-6">
+            <AffiliateCard
+              title="Replicate API"
+              description="Access 100+ AI models with one API. Perfect for developers and businesses."
+              features={[
+                "100+ pre-trained models",
+                "Custom model hosting",
+                "Pay-per-use pricing",
+                "Enterprise-grade infrastructure"
+              ]}
+              ctaText="Get Full Access"
+              affiliateUrl="https://replicate.com/pricing"
+              commission="Revenue share"
+              rating={4.8}
+              onAffiliateClick={trackAffiliateClick}
+              service="replicate"
+            />
+
+            <AffiliateCard
+              title="OpenAI API"
+              description="Access GPT-4, DALL-E, and more powerful AI models for your applications."
+              features={[
+                "GPT-4 & GPT-3.5 Turbo",
+                "DALL-E image generation",
+                "Whisper speech-to-text",
+                "Function calling"
+              ]}
+              ctaText="Start Building"
+              affiliateUrl="https://platform.openai.com/signup"
+              commission="Usage credits"
+              rating={4.9}
+              onAffiliateClick={trackAffiliateClick}
+              service="openai"
+            />
+
+            <Card className="bg-gradient-to-br from-[#6cae75]/10 to-[#5a9d64]/10 border border-[#6cae75]/30 rounded-[20px]">
+              <CardContent className="p-4 text-center">
+                <h3 className="font-semibold text-[#22201d] mb-2">Need More Time?</h3>
+                <p className="text-sm text-[#22201d] opacity-70 mb-3">
+                  Upgrade to unlimited daily usage and access premium features.
+                </p>
+                <Button className="w-full bg-[#6cae75] hover:bg-[#5a9d64] text-white rounded-[30px]">
+                  Upgrade Now
+                </Button>
+              </CardContent>
             </Card>
           </div>
         </div>

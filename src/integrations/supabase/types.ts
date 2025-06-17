@@ -9,6 +9,69 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      affiliate_clicks: {
+        Row: {
+          affiliate_service: string
+          clicked_at: string | null
+          id: string
+          ip_address: unknown
+          user_id: string | null
+        }
+        Insert: {
+          affiliate_service: string
+          clicked_at?: string | null
+          id?: string
+          ip_address: unknown
+          user_id?: string | null
+        }
+        Update: {
+          affiliate_service?: string
+          clicked_at?: string | null
+          id?: string
+          ip_address?: unknown
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string | null
+          expires_at: string | null
+          id: string
+          plan_type: string
+          status: string | null
+          stripe_session_id: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          plan_type: string
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string | null
+          expires_at?: string | null
+          id?: string
+          plan_type?: string
+          status?: string | null
+          stripe_session_id?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -36,12 +99,53 @@ export type Database = {
         }
         Relationships: []
       }
+      usage_tracking: {
+        Row: {
+          category: string
+          created_at: string | null
+          date: string | null
+          id: string
+          ip_address: unknown
+          updated_at: string | null
+          usage_minutes: number | null
+          user_id: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          ip_address: unknown
+          updated_at?: string | null
+          usage_minutes?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          date?: string | null
+          id?: string
+          ip_address?: unknown
+          updated_at?: string | null
+          usage_minutes?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      update_usage_tracking: {
+        Args: {
+          p_user_id: string
+          p_ip_address: unknown
+          p_category: string
+          p_minutes: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
