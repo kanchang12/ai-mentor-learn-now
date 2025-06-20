@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -87,16 +86,21 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
 
       console.log('AI service response:', data);
       
+      // Handle different response formats
+      if (category === 'images' && data?.generationId) {
+        return `Image generation started! Generation ID: ${data.generationId}. ${data.message || 'Please check back in a moment for your generated image.'}`;
+      }
+      
       return data?.response || data?.result || data?.message || 'AI response received successfully';
     } catch (error) {
       console.error('AI service error:', error);
       
       // Provide helpful error messages based on the error
       if (error.message?.includes('not configured')) {
-        return `${category} AI service is not configured yet. Please contact the administrator to set up the API keys in the admin panel.`;
+        return `${category} AI service is not configured yet. Please go to the Admin panel and add your API keys for the services to work properly.`;
       }
       
-      return `AI service for ${category} is currently being set up. Please try again in a moment, or contact support if the issue persists.`;
+      return `AI service for ${category} is currently being set up. Please add your API keys in the Admin panel, or contact support if the issue persists.`;
     }
   };
 
