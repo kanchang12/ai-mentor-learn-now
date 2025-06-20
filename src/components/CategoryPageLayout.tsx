@@ -49,33 +49,33 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
   const callAIService = async (prompt: string) => {
     try {
       let serviceName = '';
-      let requestBody: any = { prompt };
+      let requestBody: any = {};
       
       switch (category) {
         case 'general':
           serviceName = 'perplexity-chat';
-          requestBody = { message: prompt };
+          requestBody = { service: serviceName, message: prompt };
           break;
         case 'writing':
           serviceName = 'perplexity-writing';
-          requestBody = { prompt, writingType: 'general' };
+          requestBody = { service: serviceName, prompt, writingType: 'general' };
           break;
         case 'images':
           serviceName = 'leonardo-generate';
-          requestBody = { prompt };
+          requestBody = { service: serviceName, prompt };
           break;
         case 'data':
           serviceName = 'claude-analyze';
-          requestBody = { prompt };
+          requestBody = { service: serviceName, prompt };
           break;
         default:
           serviceName = 'perplexity-chat';
-          requestBody = { message: prompt };
+          requestBody = { service: serviceName, message: prompt };
       }
 
-      console.log(`Calling AI service: ${serviceName} with:`, requestBody);
+      console.log(`Calling unified AI service with:`, requestBody);
 
-      const { data, error } = await supabase.functions.invoke(serviceName, {
+      const { data, error } = await supabase.functions.invoke('ai-services', {
         body: requestBody
       });
 
@@ -88,7 +88,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
       
       // Handle different response formats
       if (category === 'images' && data?.generationId) {
-        return `Image generation started! Generation ID: ${data.generationId}. ${data.message || 'Please check back in a moment for your generated image.'}`;
+        return data.response || `Image generation started! Generation ID: ${data.generationId}. ${data.message || 'Please check back in a moment for your generated image.'}`;
       }
       
       return data?.response || data?.result || data?.message || 'AI response received successfully';

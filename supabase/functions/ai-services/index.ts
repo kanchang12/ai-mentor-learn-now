@@ -1,3 +1,4 @@
+
 // supabase/functions/ai-services/index.ts
 // ONE FILE FOR ALL AI SERVICES
 
@@ -22,6 +23,8 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
+    console.log(`AI Services called with service: ${service}, params:`, params)
+
     // Route to appropriate AI service
     switch (service) {
       case 'perplexity-chat':
@@ -37,6 +40,7 @@ serve(async (req) => {
         return await handleClaudeAnalyze(supabase, params)
       
       default:
+        console.error(`Unknown service: ${service}`)
         return new Response(
           JSON.stringify({ error: `Unknown service: ${service}` }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
@@ -54,6 +58,8 @@ serve(async (req) => {
 
 // Helper function to get API key from database
 async function getApiKey(supabase: any, keyName: string) {
+  console.log(`Fetching API key: ${keyName}`)
+  
   const { data, error } = await supabase
     .from('admin_settings')
     .select('value')
@@ -62,14 +68,17 @@ async function getApiKey(supabase: any, keyName: string) {
     .single()
 
   if (error || !data?.value) {
+    console.error(`API key ${keyName} not found:`, error)
     throw new Error(`${keyName} not configured. Please set it in the admin panel.`)
   }
 
+  console.log(`Successfully retrieved API key: ${keyName}`)
   return data.value
 }
 
-// PERPLEXITY CHAT
+// PERPLEXITY CHAT (for general questions)
 async function handlePerplexityChat(supabase: any, params: any) {
+  console.log('Handling Perplexity Chat request')
   const { message } = params
   const apiKey = await getApiKey(supabase, 'PERPLEXITY_API_KEY')
 
@@ -88,10 +97,13 @@ async function handlePerplexityChat(supabase: any, params: any) {
   })
 
   if (!response.ok) {
+    const errorText = await response.text()
+    console.error('Perplexity API error:', response.status, errorText)
     throw new Error(`Perplexity API error: ${response.status}`)
   }
 
   const data = await response.json()
+  console.log('Perplexity Chat response received')
   
   return new Response(
     JSON.stringify({ 
@@ -102,8 +114,9 @@ async function handlePerplexityChat(supabase: any, params: any) {
   )
 }
 
-// PERPLEXITY WRITING
+// PERPLEXITY WRITING (for writing assistance)
 async function handlePerplexityWriting(supabase: any, params: any) {
+  console.log('Handling Perplexity Writing request')
   const { prompt, writingType = 'general' } = params
   const apiKey = await getApiKey(supabase, 'PERPLEXITY_API_KEY')
 
@@ -130,10 +143,13 @@ async function handlePerplexityWriting(supabase: any, params: any) {
   })
 
   if (!response.ok) {
+    const errorText = await response.text()
+    console.error('Perplexity Writing API error:', response.status, errorText)
     throw new Error(`Perplexity API error: ${response.status}`)
   }
 
   const data = await response.json()
+  console.log('Perplexity Writing response received')
   
   return new Response(
     JSON.stringify({ 
@@ -147,8 +163,11 @@ async function handlePerplexityWriting(supabase: any, params: any) {
 
 // LEONARDO AI IMAGE GENERATION
 async function handleLeonardoGenerate(supabase: any, params: any) {
+  console.log('Handling Leonardo AI image generation request')
   const { prompt, width = 1024, height = 1024, numImages = 1 } = params
   const apiKey = await getApiKey(supabase, 'LEONARDO_API_KEY')
+
+  console.log('Starting Leonardo image generation with prompt:', prompt)
 
   const response = await fetch('https://cloud.leonardo.ai/api/rest/v1/generations', {
     method: 'POST',
@@ -158,7 +177,7 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
     },
     body: JSON.stringify({
       prompt: prompt,
-      modelId: 'ac614f96-1082-45bf-be9d-757f2d31c174',
+      modelId: 'ac614f96-1082-45bf-be9d-757f2d31c174', // Leonardo Kino XL model
       width: width,
       height: height,
       num_images: numImages,
@@ -169,13 +188,17 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
   })
 
   if (!response.ok) {
+    const errorText = await response.text()
+    console.error('Leonardo API error:', response.status, errorText)
     throw new Error(`Leonardo API error: ${response.status}`)
   }
 
   const data = await response.json()
+  console.log('Leonardo API response:', data)
   
   if (data.sdGenerationJob) {
     const generationId = data.sdGenerationJob.generationId
+    console.log('Image generation started with ID:', generationId)
     
     // Poll for completion
     let attempts = 0
@@ -190,13 +213,16 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
       
       if (statusResponse.ok) {
         const statusData = await statusResponse.json()
+        console.log(`Generation status check ${attempts + 1}:`, statusData.generations_by_pk?.status)
         
         if (statusData.generations_by_pk?.status === 'COMPLETE') {
+          console.log('Image generation completed successfully')
           return new Response(
             JSON.stringify({ 
               success: true,
               images: statusData.generations_by_pk.generated_images,
-              generationId: generationId
+              generationId: generationId,
+              response: `Image generated successfully! Your image is ready.`
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
@@ -206,12 +232,14 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
       attempts++
     }
     
+    console.log('Image generation timed out, returning processing status')
     return new Response(
       JSON.stringify({ 
         success: true,
         generationId: generationId,
         message: 'Image generation in progress. Check back in a moment.',
-        status: 'processing'
+        status: 'processing',
+        response: `Image generation started! Generation ID: ${generationId}. Please check back in a moment for your generated image.`
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
@@ -220,8 +248,9 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
   throw new Error('Failed to start image generation')
 }
 
-// CLAUDE AI ANALYSIS
+// CLAUDE AI ANALYSIS (for data analysis)
 async function handleClaudeAnalyze(supabase: any, params: any) {
+  console.log('Handling Claude AI analysis request')
   const { prompt, context = '' } = params
   const apiKey = await getApiKey(supabase, 'CLAUDE_API_KEY')
 
@@ -247,10 +276,13 @@ async function handleClaudeAnalyze(supabase: any, params: any) {
   })
 
   if (!response.ok) {
+    const errorText = await response.text()
+    console.error('Claude API error:', response.status, errorText)
     throw new Error(`Claude API error: ${response.status}`)
   }
 
   const data = await response.json()
+  console.log('Claude AI response received')
   
   return new Response(
     JSON.stringify({ 
