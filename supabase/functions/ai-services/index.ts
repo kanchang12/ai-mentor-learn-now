@@ -20,7 +20,7 @@ serve(async (req) => {
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')!
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     const supabase = createClient(supabaseUrl, supabaseKey)
 
     console.log(`AI Services called with service: ${service}, params:`, params)
@@ -60,26 +60,41 @@ serve(async (req) => {
 async function getApiKey(supabase: any, keyName: string) {
   console.log(`Fetching API key: ${keyName}`)
   
-  const { data, error } = await supabase
-    .from('admin_settings')
-    .select('value')
-    .eq('type', 'api_key')
-    .eq('key', keyName)
-    .single()
+  try {
+    const { data, error } = await supabase
+      .from('admin_settings')
+      .select('value')
+      .eq('type', 'api_key')
+      .eq('key', keyName)
+      .maybeSingle()
 
-  if (error || !data?.value) {
-    console.error(`API key ${keyName} not found:`, error)
-    throw new Error(`${keyName} not configured. Please set it in the admin panel.`)
+    if (error) {
+      console.error(`Database error fetching ${keyName}:`, error)
+      throw new Error(`Database error: ${error.message}`)
+    }
+
+    if (!data || !data.value) {
+      console.error(`API key ${keyName} not found in database`)
+      throw new Error(`${keyName} not configured. Please set it in the admin panel.`)
+    }
+
+    console.log(`Successfully retrieved API key: ${keyName}`)
+    return data.value
+  } catch (error) {
+    console.error(`Error getting API key ${keyName}:`, error)
+    throw error
   }
-
-  console.log(`Successfully retrieved API key: ${keyName}`)
-  return data.value
 }
 
 // PERPLEXITY CHAT (for general questions)
 async function handlePerplexityChat(supabase: any, params: any) {
   console.log('Handling Perplexity Chat request')
   const { message } = params
+  
+  if (!message) {
+    throw new Error('Message is required for perplexity chat')
+  }
+
   const apiKey = await getApiKey(supabase, 'PERPLEXITY_API_KEY')
 
   const response = await fetch('https://api.perplexity.ai/chat/completions', {
@@ -99,11 +114,11 @@ async function handlePerplexityChat(supabase: any, params: any) {
   if (!response.ok) {
     const errorText = await response.text()
     console.error('Perplexity API error:', response.status, errorText)
-    throw new Error(`Perplexity API error: ${response.status}`)
+    throw new Error(`Perplexity API error: ${response.status} - ${errorText}`)
   }
 
   const data = await response.json()
-  console.log('Perplexity Chat response received')
+  console.log('Perplexity Chat response received successfully')
   
   return new Response(
     JSON.stringify({ 
@@ -118,6 +133,11 @@ async function handlePerplexityChat(supabase: any, params: any) {
 async function handlePerplexityWriting(supabase: any, params: any) {
   console.log('Handling Perplexity Writing request')
   const { prompt, writingType = 'general' } = params
+  
+  if (!prompt) {
+    throw new Error('Prompt is required for perplexity writing')
+  }
+
   const apiKey = await getApiKey(supabase, 'PERPLEXITY_API_KEY')
 
   const writingPrompt = `As a professional ${writingType} writer, please help with: ${prompt}`
@@ -145,11 +165,11 @@ async function handlePerplexityWriting(supabase: any, params: any) {
   if (!response.ok) {
     const errorText = await response.text()
     console.error('Perplexity Writing API error:', response.status, errorText)
-    throw new Error(`Perplexity API error: ${response.status}`)
+    throw new Error(`Perplexity API error: ${response.status} - ${errorText}`)
   }
 
   const data = await response.json()
-  console.log('Perplexity Writing response received')
+  console.log('Perplexity Writing response received successfully')
   
   return new Response(
     JSON.stringify({ 
@@ -165,6 +185,11 @@ async function handlePerplexityWriting(supabase: any, params: any) {
 async function handleLeonardoGenerate(supabase: any, params: any) {
   console.log('Handling Leonardo AI image generation request')
   const { prompt, width = 1024, height = 1024, numImages = 1 } = params
+  
+  if (!prompt) {
+    throw new Error('Prompt is required for Leonardo image generation')
+  }
+
   const apiKey = await getApiKey(supabase, 'LEONARDO_API_KEY')
 
   console.log('Starting Leonardo image generation with prompt:', prompt)
@@ -190,7 +215,7 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
   if (!response.ok) {
     const errorText = await response.text()
     console.error('Leonardo API error:', response.status, errorText)
-    throw new Error(`Leonardo API error: ${response.status}`)
+    throw new Error(`Leonardo API error: ${response.status} - ${errorText}`)
   }
 
   const data = await response.json()
@@ -202,7 +227,7 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
     
     // Poll for completion
     let attempts = 0
-    const maxAttempts = 20
+    const maxAttempts = 15
     
     while (attempts < maxAttempts) {
       await new Promise(resolve => setTimeout(resolve, 3000))
@@ -217,12 +242,14 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
         
         if (statusData.generations_by_pk?.status === 'COMPLETE') {
           console.log('Image generation completed successfully')
+          const images = statusData.generations_by_pk.generated_images || []
+          
           return new Response(
             JSON.stringify({ 
               success: true,
-              images: statusData.generations_by_pk.generated_images,
+              images: images,
               generationId: generationId,
-              response: `Image generated successfully! Your image is ready.`
+              response: `Image generated successfully! ${images.length} image(s) ready.`
             }),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           )
@@ -252,6 +279,11 @@ async function handleLeonardoGenerate(supabase: any, params: any) {
 async function handleClaudeAnalyze(supabase: any, params: any) {
   console.log('Handling Claude AI analysis request')
   const { prompt, context = '' } = params
+  
+  if (!prompt) {
+    throw new Error('Prompt is required for Claude analysis')
+  }
+
   const apiKey = await getApiKey(supabase, 'CLAUDE_API_KEY')
 
   const fullPrompt = context ? `Context: ${context}\n\nAnalyze: ${prompt}` : prompt
@@ -278,11 +310,11 @@ async function handleClaudeAnalyze(supabase: any, params: any) {
   if (!response.ok) {
     const errorText = await response.text()
     console.error('Claude API error:', response.status, errorText)
-    throw new Error(`Claude API error: ${response.status}`)
+    throw new Error(`Claude API error: ${response.status} - ${errorText}`)
   }
 
   const data = await response.json()
-  console.log('Claude AI response received')
+  console.log('Claude AI response received successfully')
   
   return new Response(
     JSON.stringify({ 

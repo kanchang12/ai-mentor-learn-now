@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +24,6 @@ interface CategoryPageLayoutProps {
     service: string;
     features?: string[];
   }>;
-  // Allow additional props that pages might pass
   [key: string]: any;
 }
 
@@ -51,6 +51,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
       let serviceName = '';
       let requestBody: any = {};
       
+      // Map categories to service names and prepare request bodies
       switch (category) {
         case 'general':
           serviceName = 'perplexity-chat';
@@ -73,7 +74,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
           requestBody = { service: serviceName, message: prompt };
       }
 
-      console.log(`Calling unified AI service with:`, requestBody);
+      console.log(`Calling AI service: ${serviceName} with request:`, requestBody);
 
       const { data, error } = await supabase.functions.invoke('ai-services', {
         body: requestBody
@@ -81,26 +82,37 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
 
       if (error) {
         console.error('Supabase function error:', error);
-        throw error;
+        throw new Error(error.message || 'Service call failed');
       }
 
       console.log('AI service response:', data);
       
       // Handle different response formats
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+      
       if (category === 'images' && data?.generationId) {
         return data.response || `Image generation started! Generation ID: ${data.generationId}. ${data.message || 'Please check back in a moment for your generated image.'}`;
       }
       
       return data?.response || data?.result || data?.message || 'AI response received successfully';
+      
     } catch (error) {
       console.error('AI service error:', error);
       
-      // Provide helpful error messages based on the error
-      if (error.message?.includes('not configured')) {
-        return `${category} AI service is not configured yet. Please go to the Admin panel and add your API keys for the services to work properly.`;
+      // Provide specific error messages
+      const errorMessage = error.message || 'Unknown error occurred';
+      
+      if (errorMessage.includes('not configured')) {
+        return `The ${category} AI service requires API keys to be configured. Please contact your administrator to set up the necessary API keys in the Admin panel.`;
       }
       
-      return `AI service for ${category} is currently being set up. Please add your API keys in the Admin panel, or contact support if the issue persists.`;
+      if (errorMessage.includes('Database error') || errorMessage.includes('not found')) {
+        return `The ${category} AI service is not properly configured. Please ensure API keys are set in the Admin panel.`;
+      }
+      
+      return `Error with ${category} AI service: ${errorMessage}. Please try again or contact support.`;
     }
   };
 
@@ -121,7 +133,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
     setIsLoading(true);
 
     try {
-      const aiResponse = await callAIService(input);
+      const aiResponse = await callAIService(input.trim());
       setResponse(aiResponse);
       
       // Track usage time (simulate 1 minute per request for demo)
@@ -135,6 +147,7 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
         description: "Something went wrong. Please try again.",
         variant: "destructive",
       });
+      setResponse("Sorry, there was an error processing your request. Please try again.");
     } finally {
       setIsLoading(false);
     }
