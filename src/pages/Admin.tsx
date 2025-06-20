@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -164,54 +165,53 @@ const Admin = () => {
     }
   };
 
-// REPLACE your loadApiKeys function (around line 144) with this:
-const loadApiKeys = async () => {
-  try {
-    // Load API keys from Supabase database instead of localStorage
-    const { data, error } = await supabase
-      .from('admin_settings')
-      .select('key, value')
-      .eq('type', 'api_key');
+  const loadApiKeys = async () => {
+    try {
+      // Load API keys from Supabase database instead of localStorage
+      const { data, error } = await supabase
+        .from('admin_settings')
+        .select('key, value')
+        .eq('type', 'api_key');
 
-    if (error) {
-      console.error('Error loading API keys:', error);
-      // Fallback to localStorage if database fails
+      if (error) {
+        console.error('Error loading API keys:', error);
+        // Fallback to localStorage if database fails
+        const keys = {
+          perplexity: localStorage.getItem('api_key_perplexity') || '',
+          leonardo: localStorage.getItem('api_key_leonardo') || '',
+          claude: localStorage.getItem('api_key_claude') || '',
+          vapi_api_key: localStorage.getItem('vapi_api_key') || '',
+          vapi_assistant_id: localStorage.getItem('vapi_assistant_id') || '',
+          openai: localStorage.getItem('api_key_openai') || '',
+          anthropic: localStorage.getItem('api_key_anthropic') || '',
+          huggingface: localStorage.getItem('api_key_huggingface') || ''
+        };
+        setApiKeys(keys);
+        return;
+      }
+
+      // Convert database results to the format your UI expects
       const keys = {
-        perplexity: localStorage.getItem('api_key_perplexity') || '',
-        leonardo: localStorage.getItem('api_key_leonardo') || '',
-        claude: localStorage.getItem('api_key_claude') || '',
-        vapi_api_key: localStorage.getItem('vapi_api_key') || '',
-        vapi_assistant_id: localStorage.getItem('vapi_assistant_id') || '',
-        openai: localStorage.getItem('api_key_openai') || '',
-        anthropic: localStorage.getItem('api_key_anthropic') || '',
-        huggingface: localStorage.getItem('api_key_huggingface') || ''
+        perplexity: data?.find(k => k.key === 'PERPLEXITY_API_KEY')?.value || '',
+        leonardo: data?.find(k => k.key === 'LEONARDO_API_KEY')?.value || '',
+        claude: data?.find(k => k.key === 'CLAUDE_API_KEY')?.value || '',
+        vapi_api_key: data?.find(k => k.key === 'VAPI_API_KEY')?.value || '',
+        vapi_assistant_id: data?.find(k => k.key === 'VAPI_ASSISTANT_ID')?.value || '',
+        openai: data?.find(k => k.key === 'OPENAI_API_KEY')?.value || '',
+        anthropic: data?.find(k => k.key === 'ANTHROPIC_API_KEY')?.value || '',
+        huggingface: data?.find(k => k.key === 'HUGGINGFACE_API_KEY')?.value || ''
       };
+      
       setApiKeys(keys);
-      return;
+    } catch (error) {
+      console.error('Error loading API keys:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load API keys",
+        variant: "destructive",
+      });
     }
-
-    // Convert database results to the format your UI expects
-    const keys = {
-      perplexity: data?.find(k => k.key === 'PERPLEXITY_API_KEY')?.value || '',
-      leonardo: data?.find(k => k.key === 'LEONARDO_API_KEY')?.value || '',
-      claude: data?.find(k => k.key === 'CLAUDE_API_KEY')?.value || '',
-      vapi_api_key: data?.find(k => k.key === 'VAPI_API_KEY')?.value || '',
-      vapi_assistant_id: data?.find(k => k.key === 'VAPI_ASSISTANT_ID')?.value || '',
-      openai: data?.find(k => k.key === 'OPENAI_API_KEY')?.value || '',
-      anthropic: data?.find(k => k.key === 'ANTHROPIC_API_KEY')?.value || '',
-      huggingface: data?.find(k => k.key === 'HUGGINGFACE_API_KEY')?.value || ''
-    };
-    
-    setApiKeys(keys);
-  } catch (error) {
-    console.error('Error loading API keys:', error);
-    toast({
-      title: "Error",
-      description: "Failed to load API keys",
-      variant: "destructive",
-    });
-  }
-};
+  };
 
   const demoteUser = async (userId: string) => {
     try {
@@ -244,44 +244,91 @@ const loadApiKeys = async () => {
     }
   };
 
-  // REPLACE your updateApiKey function (around line 209) with this:
-const updateApiKey = async (service: string, key: string) => {
-  if (!key.trim()) {
-    toast({
-      title: "Error",
-      description: "API key cannot be empty",
-      variant: "destructive",
-    });
-    return;
-  }
+  const promoteToAdmin = async (userId: string) => {
+    try {
+      console.log('Promoting user to admin:', userId);
+      
+      const { error } = await supabase
+        .from('user_roles')
+        .insert({
+          user_id: userId,
+          role: 'admin'
+        });
 
-  try {
-    // Convert service name to database key format
-    let dbKey: string;
-    if (service === 'VAPI API Key') {
-      dbKey = 'VAPI_API_KEY';
-    } else if (service === 'VAPI Assistant ID') {
-      dbKey = 'VAPI_ASSISTANT_ID';
-    } else {
-      dbKey = `${service.toUpperCase()}_API_KEY`;
-    }
+      if (error) {
+        console.error('Error promoting user:', error);
+        throw error;
+      }
 
-    // Save to Supabase database (where Edge Functions can access)
-    const { error } = await supabase
-      .from('admin_settings')
-      .upsert({
-        type: 'api_key',
-        key: dbKey,
-        value: key,
-        updated_at: new Date().toISOString()
+      toast({
+        title: "Success",
+        description: "User promoted to admin successfully",
       });
 
-    if (error) {
-      console.error('Database save error:', error);
-      throw error;
+      await fetchAdminData();
+    } catch (error) {
+      console.error('Error promoting user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to promote user to admin. Check console for details.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const updateApiKey = async (service: string, key: string) => {
+    if (!key.trim()) {
+      toast({
+        title: "Error",
+        description: "API key cannot be empty",
+        variant: "destructive",
+      });
+      return;
     }
 
-    
+    try {
+      // Convert service name to database key format
+      let dbKey: string;
+      if (service === 'VAPI API Key') {
+        dbKey = 'VAPI_API_KEY';
+      } else if (service === 'VAPI Assistant ID') {
+        dbKey = 'VAPI_ASSISTANT_ID';
+      } else {
+        dbKey = `${service.toUpperCase()}_API_KEY`;
+      }
+
+      // Save to Supabase database (where Edge Functions can access)
+      const { error } = await supabase
+        .from('admin_settings')
+        .upsert({
+          type: 'api_key',
+          key: dbKey,
+          value: key,
+          updated_at: new Date().toISOString()
+        });
+
+      if (error) {
+        console.error('Database save error:', error);
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: `${service} API key saved successfully!`,
+      });
+
+      // Reload API keys to update the UI
+      await loadApiKeys();
+    } catch (error) {
+      console.error('Error updating API key:', error);
+      toast({
+        title: "Error",
+        description: `Failed to save ${service} API key`,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleQuickAction = (action: string) => {
     setActiveTab(action);
   };
