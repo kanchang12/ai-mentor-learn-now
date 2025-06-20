@@ -11,6 +11,7 @@ import { useUsageTracking } from "@/hooks/useUsageTracking";
 import { AffiliateCard } from "./AffiliateCard";
 import { VoiceAgent } from "./VoiceAgent";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CategoryPageLayoutProps {
   category: string;
@@ -45,46 +46,57 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
 
   const content = getPageContent(category);
 
-  // Function to call the appropriate AI service based on category
+  // Function to call the appropriate AI service using the unified ai-services function
   const callAIService = async (prompt: string) => {
     try {
-      let endpoint = '';
+      let serviceName = '';
+      let requestBody: any = { prompt };
       
       switch (category) {
         case 'general':
-          endpoint = '/functions/v1/perplexity-chat';
+          serviceName = 'perplexity-chat';
+          requestBody = { message: prompt };
           break;
         case 'writing':
-          endpoint = '/functions/v1/perplexity-writing';
+          serviceName = 'perplexity-writing';
+          requestBody = { prompt, writingType: 'general' };
           break;
         case 'images':
-          endpoint = '/functions/v1/leonardo-generate';
+          serviceName = 'leonardo-generate';
+          requestBody = { prompt };
           break;
         case 'data':
-          endpoint = '/functions/v1/claude-analyze';
+          serviceName = 'claude-analyze';
+          requestBody = { prompt };
           break;
         default:
-          endpoint = '/functions/v1/perplexity-chat';
+          serviceName = 'perplexity-chat';
+          requestBody = { message: prompt };
       }
 
-      const response = await fetch(`https://jwfhvjlckeenfxqumaea.supabase.co${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3Zmh2amxja2VlbmZ4cXVtYWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxMDk5NjIsImV4cCI6MjA2NTY4NTk2Mn0.QNtEY74wscU8RfAS2ylXXC_9GLKEUAbxH9IPC5N9zXw`
-        },
-        body: JSON.stringify({ prompt })
+      console.log(`Calling AI service: ${serviceName} with:`, requestBody);
+
+      const { data, error } = await supabase.functions.invoke(serviceName, {
+        body: requestBody
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
       }
 
-      const data = await response.json();
-      return data.response || data.result || data.generatedText || 'AI response received';
+      console.log('AI service response:', data);
+      
+      return data?.response || data?.result || data?.message || 'AI response received successfully';
     } catch (error) {
       console.error('AI service error:', error);
-      return `AI service for ${category} is currently being set up. This is a demo response showing how it would work when properly configured with API keys.`;
+      
+      // Provide helpful error messages based on the error
+      if (error.message?.includes('not configured')) {
+        return `${category} AI service is not configured yet. Please contact the administrator to set up the API keys in the admin panel.`;
+      }
+      
+      return `AI service for ${category} is currently being set up. Please try again in a moment, or contact support if the issue persists.`;
     }
   };
 

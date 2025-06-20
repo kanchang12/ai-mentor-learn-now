@@ -9,6 +9,30 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_settings: {
+        Row: {
+          id: string
+          key: string
+          type: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          id?: string
+          key: string
+          type: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          id?: string
+          key?: string
+          type?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       affiliate_clicks: {
         Row: {
           affiliate_service: string
@@ -30,6 +54,39 @@ export type Database = {
           id?: string
           ip_address?: unknown
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      page_content: {
+        Row: {
+          description: string | null
+          id: string
+          page: string
+          title: string
+          updated_at: string | null
+          video_description: string | null
+          video_title: string | null
+          video_url: string | null
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          page: string
+          title: string
+          updated_at?: string | null
+          video_description?: string | null
+          video_title?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          page?: string
+          title?: string
+          updated_at?: string | null
+          video_description?: string | null
+          video_title?: string | null
+          video_url?: string | null
         }
         Relationships: []
       }

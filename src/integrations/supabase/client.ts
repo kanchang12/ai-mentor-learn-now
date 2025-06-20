@@ -5,7 +5,46 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://jwfhvjlckeenfxqumaea.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp3Zmh2amxja2VlbmZ4cXVtYWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxMDk5NjIsImV4cCI6MjA2NTY4NTk2Mn0.QNtEY74wscU8RfAS2ylXXC_9GLKEUAbxH9IPC5N9zXw";
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+const originalSupabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Function call interceptor that redirects old calls to unified ai-services
+const createFunctionProxy = (client: any) => ({
+  invoke: async (functionName: string, options: any = {}) => {
+    // Map old function names to services in the unified function
+    const serviceMapping: Record<string, string> = {
+      'perplexity-chat': 'perplexity-chat',
+      'perplexity-writing': 'perplexity-writing', 
+      'leonardo-generate': 'leonardo-generate',
+      'claude-analyze': 'claude-analyze',
+      'perplexity-general': 'perplexity-chat',
+      'perplexity-content': 'perplexity-writing'
+    }
+
+    if (serviceMapping[functionName]) {
+      // Redirect to unified ai-services function
+      const originalBody = options.body || {}
+      
+      return client.functions.invoke('ai-services', {
+        ...options,
+        body: {
+          service: serviceMapping[functionName],
+          ...originalBody
+        }
+      })
+    }
+
+    // Pass through other functions unchanged
+    return client.functions.invoke(functionName, options)
+  }
+})
+
+// Create the intercepted supabase client
+export const supabase = {
+  ...originalSupabase,
+  functions: createFunctionProxy(originalSupabase),
+  auth: originalSupabase.auth,
+  from: originalSupabase.from.bind(originalSupabase),
+  storage: originalSupabase.storage,
+  realtime: originalSupabase.realtime,
+  channel: originalSupabase.channel.bind(originalSupabase)
+};
