@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,6 +44,38 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
 
   const content = getPageContent(category);
 
+  // Function to display generated images (for Images page only)
+  const displayGeneratedImages = (images: any[]) => {
+    if (category !== 'images' || !images || images.length === 0) return;
+
+    const container = document.getElementById('generated-images-container');
+    if (!container) return;
+
+    // Clear the placeholder text
+    container.innerHTML = '';
+
+    images.forEach((image, index) => {
+      const imageElement = document.createElement('div');
+      imageElement.className = 'relative group';
+      imageElement.innerHTML = `
+        <img 
+          src="${image.url}" 
+          alt="Generated image ${index + 1}"
+          class="w-full h-auto rounded-lg shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+          onclick="window.open('${image.url}', '_blank')"
+        />
+        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all rounded-lg flex items-center justify-center">
+          <div class="opacity-0 group-hover:opacity-100 transition-opacity">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+          </div>
+        </div>
+      `;
+      container.appendChild(imageElement);
+    });
+  };
+
   // Function to call the appropriate AI service using the unified ai-services function
   const callAIService = async (prompt: string) => {
     try {
@@ -90,6 +121,12 @@ export const CategoryPageLayout = ({ category, children, affiliateCards, ...prop
       // Handle different response formats
       if (data?.error) {
         throw new Error(data.error);
+      }
+      
+      // Handle image generation response
+      if (category === 'images' && data?.images) {
+        displayGeneratedImages(data.images);
+        return data.response || `Image generation completed! ${data.images.length} image(s) generated successfully.`;
       }
       
       if (category === 'images' && data?.generationId) {

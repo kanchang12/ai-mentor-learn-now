@@ -1,6 +1,8 @@
 
 import { CategoryPageLayout } from "@/components/CategoryPageLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 
 const Data = () => {
   const affiliateCards = [
@@ -39,7 +41,7 @@ const Data = () => {
         <CardDescription>Access your custom data analysis platform</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="aspect-video rounded-lg overflow-hidden border">
+        <div className="aspect-video rounded-lg overflow-hidden border mb-4">
           <iframe
             src="https://gemnink-data-dashboard1-451954006366.europe-west1.run.app/"
             title="Data Analysis Dashboard"
@@ -48,9 +50,19 @@ const Data = () => {
             allow="clipboard-write; encrypted-media"
           />
         </div>
-        <p className="text-sm text-gray-600 mt-4">
-          Your integrated data analysis dashboard with real-time insights and visualizations.
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Your integrated data analysis dashboard with real-time insights and visualizations.
+          </p>
+          <Button 
+            variant="outline"
+            onClick={() => window.open('https://gemnink-data-dashboard1-451954006366.europe-west1.run.app/', '_blank')}
+            className="flex items-center gap-2"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Open in New Window
+          </Button>
+        </div>
       </CardContent>
     </Card>
   );
